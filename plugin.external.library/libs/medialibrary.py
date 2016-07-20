@@ -41,14 +41,20 @@ def _send_json_rpc(method, params=None):
     return json_reply['result']
 
 
-def get_movies():
+def get_movies_or_tvshows(content):
     """
-    Get the list of movies from the Kodi database
+    Get the list of movies or TV shows from the Kodi database
 
-    :return: the list of movie data as Python dicts
+    :param content: 'movies' or 'tvshows'
+    :type content: str
+    :return: the list of movie/TV show data as Python dicts
     :rtype: list
     :raises NoDataError: if the Kodi library has no movies
     """
+    if content == 'movies':
+        method = 'VideoLibrary.GetMovies'
+    else:
+        method = 'VideoLibrary.GetTVShows'
     params = {
         'properties': [
             'imdbnumber',
@@ -62,7 +68,7 @@ def get_movies():
             ],
         'sort': {'order': 'ascending', 'method': 'label'}
         }
-    result = _send_json_rpc('VideoLibrary.GetMovies', params)
-    if not result.get('movies'):
+    result = _send_json_rpc(method, params)
+    if not result.get(content):
         raise NoDataError
-    return result['movies']
+    return result[content]

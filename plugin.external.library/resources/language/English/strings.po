@@ -1,0 +1,36 @@
+# Kodi Media Center language file
+msgid ""
+msgstr ""
+
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+
+msgctxt "#32000"
+msgid "General"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Remote Kodi host"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Remote Kodi port"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Recently added movies"
+msgstr ""
+
+msgctxt "#32005"
+msgid "TV Shows"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Recently added episodes"
+msgstr ""

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <category label="32000">
+    <setting id="kodi_host" type="text"
+      label="32001" default="" />
+    <setting id="kodi_port" type="number"
+      label="32002" default="8080" />
+    <setting id="show_movies" type="bool"
+      label="32003" default="true" />
+    <setting id="show_recent_movies" type="bool"
+      label="32004" default="true" enable="eq(-1,true)" />
+    <setting id="show_tvshows" type="bool"
+      label="32005" default="true" />
+    <setting id="flatten_tvshows" type="enum" lvalues="20420|20421|20422"
+      label="20412" default="1" enable="eq(-1,true)" />
+    <setting id="show_recent_episodes" type="bool"
+      label="32006" default="true" enable="eq(-2,true)" />
+  </category>
+</settings>

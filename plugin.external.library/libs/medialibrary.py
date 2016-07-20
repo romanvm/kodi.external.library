@@ -18,7 +18,7 @@ class NoDataError(Exception):
     pass
 
 
-def send_json_rpc(method, params=None):
+def _send_json_rpc(method, params=None):
     """
     Send JSON-RPC to remote Kodi
 
@@ -39,3 +39,30 @@ def send_json_rpc(method, params=None):
         raise ConnectionError
     plugin.log('JSON-RPC reply: {0}'.format(json_reply))
     return json_reply['result']
+
+
+def get_movies():
+    """
+    Get the list of movies from the Kodi database
+
+    :return: the list of movie data as Python dicts
+    :rtype: list
+    :raises NoDataError: if the Kodi library has no movies
+    """
+    params = {
+        'properties': [
+            'imdbnumber',
+            'playcount',
+            'art',
+            'title',
+            'plot',
+            'genre',
+            'cast',
+            'year'
+            ],
+        'sort': {'order': 'ascending', 'method': 'label'}
+        }
+    result = _send_json_rpc('VideoLibrary.GetMovies', params)
+    if not result.get('movies'):
+        raise NoDataError
+    return result['movies']

@@ -3,4 +3,6 @@
 # Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
+from libs.actions import plugin
 
+plugin.run()

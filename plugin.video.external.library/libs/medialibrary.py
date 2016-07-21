@@ -140,13 +140,3 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
     if not result.get('episodes'):
         raise NoDataError
     return result['episodes']
-
-
-def get_tvshow_details(tvshowid):
-    method = 'VideoLibrary.GetTVShowDetails'
-    params = {
-        'tvshowid': tvshowid,
-        'properties': ['title', 'imdbnumber']
-    }
-    result = _send_json_rpc(method, params)['tvshowdetails']
-    return TVShowDetails(result['title'], result['imdbnumber'])

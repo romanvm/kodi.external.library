@@ -41,34 +41,40 @@ def _send_json_rpc(method, params=None):
     return json_reply['result']
 
 
-def get_movies_or_tvshows(content):
+def _get_info(method, additional_properties=None, sort=None):
     """
-    Get the list of movies or TV shows from the Kodi database
+    Get the list of media items for Kodi database
 
-    :param content: 'movies' or 'tvshows'
-    :type content: str
-    :return: the list of movie/TV show data as Python dicts
+    :param method:
+    :param additional_properties:
+    :param sort:
+    :return:
+    """
+    params = {'properties': ['art', 'title', 'year']}
+    if additional_properties is not None:
+        params['properties'] += additional_properties
+    if sort is not None:
+        params['sort'] = sort
+    return _send_json_rpc(method, params)
+
+
+def get_movies(recent=False):
+    """
+    Get the list of movies from the Kodi database
+
+    :param recent:
+    :return: the list of movie data as Python dicts
     :rtype: list
     :raises NoDataError: if the Kodi library has no movies
     """
-    if content == 'movies':
-        method = 'VideoLibrary.GetMovies'
+    if recent:
+        method = 'VideoLibrary.GetRecentlyAddedMovies'
+        sort = {'order': 'descending', 'method': 'dateadded'}
     else:
-        method = 'VideoLibrary.GetTVShows'
-    params = {
-        'properties': [
-            'imdbnumber',
-            'playcount',
-            'art',
-            'title',
-            'plot',
-            'genre',
-            'cast',
-            'year'
-            ],
-        'sort': {'order': 'ascending', 'method': 'label'}
-        }
-    result = _send_json_rpc(method, params)
-    if not result.get(content):
+        method = 'VideoLibrary.GetMovies'
+        sort = {'order': 'ascending', 'method': 'label'}
+    properties = ['file', 'playcount', 'resume', 'plot', 'director', 'genre', 'cast', 'imdbnumber']
+    result = _get_info(method, properties, sort)
+    if not result.get('movies'):
         raise NoDataError
-    return result[content]
+    return result['movies']

@@ -4,11 +4,13 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
 from urllib import quote_plus
+from xbmcgui import Dialog
 from simpleplugin import Plugin
 import medialibrary as ml
 
 plugin = Plugin()
 _ = plugin.initialize_gettext()
+dialog = Dialog()
 
 
 def root(params):
@@ -84,8 +86,10 @@ def library_items(params):
         if content.endswith('movies'):
             items = ml.get_movies(recent=content.startswith('recent'))
             plugin_content = 'movies'
+    except ml.ConnectionError:
+        dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')
     except ml.NoDataError:
-        pass
+        dialog.notification(plugin.id, _('Remote Kodi library contains no relevant data!'), icon='error')
     else:
         listing = _show_library_items(items, content)
     return plugin.create_listing(listing, content=plugin_content)

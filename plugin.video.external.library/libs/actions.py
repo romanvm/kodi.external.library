@@ -30,7 +30,77 @@ def root(params):
         }
 
 
-def _show_library_items(items, content, tvshow_details=None):
+def _set_info(content, item, list_item):
+    """
+    Set list item info
+    """
+    video_info = {}
+    if content.endswith('movies') or content == 'tvshows':
+        video_info['title'] = item['label']
+        video_info['genre'] = u', '.join(item['genre'])
+        video_info['year'] = item['year']
+        video_info['plot'] = item['plot']
+        video_info['cast'] = [actor['name'] for actor in item['cast']]
+        video_info['director'] = u', '.join(item['director'])
+    elif content == 'seasons':
+        video_info['tvshowtitle'] = item['showtitle']
+    elif content == 'episodes':
+        video_info['tvshowtitle'] = item['showtitle']
+        video_info['plot'] = item['plot']
+        video_info['cast'] = [actor['name'] for actor in item['cast']]
+        video_info['director'] = u', '.join(item['director'])
+        video_info['premiered'] = item['firstaired']
+    if content.endswith('movies'):
+        video_info['imdbnumber'] = str(item['movieid'])
+    elif content.endswith('episodes'):
+        video_info['imdbnumber'] = str(item['tvshowid'])
+    list_item['info']['video'] = video_info
+
+
+def _set_art(content, item, list_item):
+    """
+    Set list item artwork
+    """
+    if content == 'tvshows':
+        list_item['art']['banner'] = image_url + quote_plus(item['art'].get('banner'), '')
+    if content.endswith('movies') or content == 'tvshows':
+        list_item['thumb'] = list_item['art']['poster'] = image_url + quote_plus(item['art'].get('poster', ''))
+        list_item['fanart'] = image_url + quote_plus(item['art'].get('fanart', ''))
+    elif content == 'seasons':
+        list_item['thumb'] = list_item['art']['poster'] = image_url + quote_plus(
+            item['art'].get('season.poster') or
+            item['art'].get('tvshow.poster') or
+            item['art'].get('poster', '')
+        )
+        list_item['art']['banner'] = image_url + quote_plus(
+            item['art'].get('season.banner') or
+            item['art'].get('banner', '')
+        )
+        list_item['fanart'] = image_url + quote_plus(
+            item['art'].get('tvshow.fanart') or
+            item['art'].get('fanart', '')
+        )
+    elif content.endswith('episodes'):
+        list_item['thumb'] = image_url + quote_plus(
+            item['art'].get('thumb', '') or
+            item['art'].get('tvshow.poster') or
+            item['art'].get('poster', '')
+        )
+        list_item['poster'] = image_url + quote_plus(
+            item['art'].get('tvshow.poster') or
+            item['art'].get('poster', '')
+        )
+        list_item['art']['banner'] = image_url + quote_plus(
+            item['art'].get('tvshow.banner') or
+            item['art'].get('banner', '')
+        )
+        list_item['fanart'] = image_url + quote_plus(
+            item['art'].get('tvshow.fanart') or
+            item['art'].get('fanart', '')
+        )
+
+
+def _show_library_items(items, content):
     """
     Get the list of movies or TV shows
     """
@@ -47,26 +117,14 @@ def _show_library_items(items, content, tvshow_details=None):
             'thumb': 'DefaultRecentlyAddedMovies.png'
         }
     for item in items:
-        list_item = {
-            'label': item['label'],
-            'thumb': image_url + quote_plus(item['art'].get('poster', '')),
-            'fanart': image_url + quote_plus(item['art'].get('fanart', '')),
-            'art': {'poster': image_url + quote_plus(item['art'].get('poster', ''))},
-            'info': {
-                'video': {
-                    'imdbnumber': item['imdbnumber'],
-                    'title': item['title'],
-                    'cast': [actor['name'] for actor in item['cast']],
-                    'year': item['year'],
-                    'genre': u', '.join(item['genre']),
-                    'plot': item['plot']
-                    }
-                }
-            }
-        if content.endswith('movies'):
-            list_item['info']['video']['director'] = item['director']
+        list_item = {'label': item['label'], 'art': {}, 'info': {}}
+        _set_info(content, item, list_item)
+        _set_art(content, item, list_item)
+        if content.endswith('movies') or content.endswith('episodes'):
+            list_item['context_menu'] = [('Toggle watched', 'Action(ToggleWatched)')]
             list_item['info']['video']['playcount'] = item['playcount']
             list_item['url'] = ml.kodi_url + '/vfs/' + quote_plus(item['file'])
+            # list_item['url'] = plugin.get_url(action='play', file=item['file'])
             list_item['is_playable'] = True
         elif content == 'tvshows':
             list_item['url'] = plugin.get_url(action='library_items', content='seasons', tvshowid=item['tvshowid'])
@@ -96,5 +154,13 @@ def library_items(params):
     return plugin.create_listing(listing, content=plugin_content)
 
 
+def play(params):
+    """
+    Play video
+    """
+    return ml.kodi_url + '/vfs/' + quote_plus(params['file'])
+
+
 plugin.actions['root'] = root
 plugin.actions['library_items'] = library_items
+plugin.actions['play'] = play

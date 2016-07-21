@@ -36,7 +36,7 @@ msgid "Recently added episodes"
 msgstr ""
 
 msgctxt "#32007"
-msgid "Unable to connect to the Remote Kodi host!"
+msgid "Unable to connect to the remote Kodi host!"
 msgstr ""
 
 msgctxt "#32008"

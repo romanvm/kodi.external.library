@@ -52,7 +52,7 @@ def _get_info(method, params):
     :param sort:
     :return:
     """
-    params['properties'] += ['art', 'title', 'year']
+    params['properties'] += ['art']
     return _send_json_rpc(method, params)
 
 
@@ -72,7 +72,10 @@ def get_movies(recent=False):
         method = 'VideoLibrary.GetMovies'
         sort = {'order': 'ascending', 'method': 'label'}
     params = {
-        'properties': ['file', 'playcount', 'resume', 'plot', 'director', 'genre', 'cast', 'imdbnumber'],
+        'properties': [
+            'file', 'playcount', 'resume', 'plot',
+            'director', 'genre', 'cast', 'imdbnumber', 'year'
+        ],
         'sort': sort
     }
     result = _get_info(method, params)
@@ -108,7 +111,7 @@ def get_seasons(tvshowid):
     method = 'VideoLibrary.GetSeasons'
     params = {
         'tvshowid': tvshowid,
-        'properties': ['season', 'tvshowid'],
+        'properties': ['showtitle', 'season', 'tvshowid'],
         'sort': {'order': 'ascending', 'method': 'season'},
     }
     result = _get_info(method, params)
@@ -126,7 +129,10 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
     :return:
     """
     params = {
-        'properties': ['season', 'episode', 'title', 'tvshowid', 'cast', 'firstaired', 'director', 'plot', 'file'],
+        'properties': [
+            'showtitle', 'season', 'episode', 'title', 'tvshowid',
+            'cast', 'firstaired', 'director', 'plot', 'file',
+        ],
     }
     if recent:
         method = 'VideoLibrary.GetRecentlyAddedEpisodes'

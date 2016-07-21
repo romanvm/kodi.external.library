@@ -3,11 +3,13 @@
 # Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
+from collections import namedtuple
 import requests
 from simpleplugin import Plugin
 
 plugin = Plugin()
 kodi_url = 'http://{host}:{port}'.format(host=plugin.kodi_host, port=plugin.kodi_port)
+TVShowDetails = namedtuple('TVShowDetails', ['title', 'tvdbid'])
 
 
 class ConnectionError(Exception):
@@ -41,7 +43,7 @@ def _send_json_rpc(method, params=None):
     return json_reply['result']
 
 
-def _get_info(method, additional_properties=None, sort=None):
+def _get_info(method, params):
     """
     Get the list of media items for Kodi database
 
@@ -50,11 +52,7 @@ def _get_info(method, additional_properties=None, sort=None):
     :param sort:
     :return:
     """
-    params = {'properties': ['art', 'title', 'year']}
-    if additional_properties is not None:
-        params['properties'] += additional_properties
-    if sort is not None:
-        params['sort'] = sort
+    params['properties'] += ['art', 'title', 'year']
     return _send_json_rpc(method, params)
 
 
@@ -73,8 +71,82 @@ def get_movies(recent=False):
     else:
         method = 'VideoLibrary.GetMovies'
         sort = {'order': 'ascending', 'method': 'label'}
-    properties = ['file', 'playcount', 'resume', 'plot', 'director', 'genre', 'cast', 'imdbnumber']
-    result = _get_info(method, properties, sort)
+    params = {
+        'properties': ['file', 'playcount', 'resume', 'plot', 'director', 'genre', 'cast', 'imdbnumber'],
+        'sort': sort
+    }
+    result = _get_info(method, params)
     if not result.get('movies'):
         raise NoDataError
     return result['movies']
+
+
+def get_tvshows():
+    """
+    Get the list ov TV shows from Kodi
+
+    :return:
+    """
+    method = 'VideoLibrary.GetTVShows'
+    params = {
+        'properties': ['plot', 'genre', 'cast', 'imdbnumber'],
+        'sort': {'order': 'ascending', 'method': 'label'},
+    }
+    result = _get_info(method, params)
+    if not result.get('tvshows'):
+        raise NoDataError
+    return result['tvshows']
+
+
+def get_seasons(tvshowid):
+    """
+    Get the list ot seasons of a TV show
+
+    :param tvshowid:
+    :return:
+    """
+    method = 'VideoLibrary.GetSeasons'
+    params = {
+        'tvshowid': tvshowid,
+        'properties': ['season', 'tvshowid'],
+        'sort': {'order': 'ascending', 'method': 'season'},
+    }
+    result = _get_info(method, params)
+    if not result.get('seasons'):
+        raise NoDataError
+    return result['seasons']
+
+
+def get_episodes(tvshowid=-1, season=-1, recent=False):
+    """
+    Get the list of episodes from Kodi
+
+    :param tvshowid:
+    :param season:
+    :return:
+    """
+    params = {
+        'properties': ['season', 'episode', 'title', 'tvshowid', 'cast', 'firstaired', 'director', 'plot', 'file'],
+    }
+    if recent:
+        method = 'VideoLibrary.GetRecentlyAddedEpisodes'
+        params['sort'] = {'order': 'descending', 'method': 'dateadded'}
+    else:
+        method = 'VideoLibrary.GetEpisodes'
+        params['tvshowid'] = tvshowid
+        params['season'] = season
+        params['sort'] = {'order': 'ascending', 'method': 'episode'}
+    result = _get_info(method, params)
+    if not result.get('episodes'):
+        raise NoDataError
+    return result['episodes']
+
+
+def get_tvshow_details(tvshowid):
+    method = 'VideoLibrary.GetTVShowDetails'
+    params = {
+        'tvshowid': tvshowid,
+        'properties': ['title', 'imdbnumber']
+    }
+    result = _send_json_rpc(method, params)['tvshowdetails']
+    return TVShowDetails(result['title'], result['imdbnumber'])

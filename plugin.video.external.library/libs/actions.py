@@ -30,11 +30,9 @@ def root(params):
         }
 
 
-def _show_library_items(items, content):
+def _show_library_items(items, content, tvshow_details=None):
     """
     Get the list of movies or TV shows
-    :param content:
-    :return:
     """
     if content == 'movies' and plugin.show_recent_movies:
         yield {
@@ -50,7 +48,7 @@ def _show_library_items(items, content):
         }
     for item in items:
         list_item = {
-            'label': item['title'],
+            'label': item['label'],
             'thumb': image_url + quote_plus(item['art'].get('poster', '')),
             'fanart': image_url + quote_plus(item['art'].get('fanart', '')),
             'art': {'poster': image_url + quote_plus(item['art'].get('poster', ''))},
@@ -70,15 +68,14 @@ def _show_library_items(items, content):
             list_item['info']['video']['playcount'] = item['playcount']
             list_item['url'] = ml.kodi_url + '/vfs/' + quote_plus(item['file'])
             list_item['is_playable'] = True
+        elif content == 'tvshows':
+            list_item['url'] = plugin.get_url(action='library_items', content='seasons', tvshowid=item['tvshowid'])
         yield list_item
 
 
 def library_items(params):
     """
     Display the list of movies or TV shows
-
-    :param params:
-    :return:
     """
     listing = []
     plugin_content = None
@@ -87,6 +84,9 @@ def library_items(params):
         if content.endswith('movies'):
             items = ml.get_movies(recent=content.startswith('recent'))
             plugin_content = 'movies'
+        elif content == 'tvshows':
+            items = ml.get_tvshows()
+            plugin_content = 'tvshows'
     except ml.ConnectionError:
         dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')
     except ml.NoDataError:

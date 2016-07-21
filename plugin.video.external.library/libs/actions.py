@@ -11,6 +11,7 @@ import medialibrary as ml
 plugin = Plugin()
 _ = plugin.initialize_gettext()
 dialog = Dialog()
+image_url = ml.kodi_url + '/image/'
 
 
 def root(params):
@@ -50,9 +51,9 @@ def _show_library_items(items, content):
     for item in items:
         list_item = {
             'label': item['title'],
-            'thumb': item['art'].get('poster', ''),
-            'fanart': item['art'].get('fanart', ''),
-            'art': {'poster': item['art'].get('poster', '')},
+            'thumb': image_url + quote_plus(item['art'].get('poster', '')),
+            'fanart': image_url + quote_plus(item['art'].get('fanart', '')),
+            'art': {'poster': image_url + quote_plus(item['art'].get('poster', ''))},
             'info': {
                 'video': {
                     'imdbnumber': item['imdbnumber'],
@@ -95,16 +96,5 @@ def library_items(params):
     return plugin.create_listing(listing, content=plugin_content)
 
 
-def play(params):
-    """
-    Play a movie or an episode
-
-    :param params:
-    :return:
-    """
-    return ml.kodi_url + '/vfs/' + quote_plus(params['file'])
-
-
 plugin.actions['root'] = root
 plugin.actions['library_items'] = library_items
-plugin.actions['play'] = play

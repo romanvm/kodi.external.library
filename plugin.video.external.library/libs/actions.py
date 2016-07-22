@@ -41,16 +41,21 @@ def _set_info(content, item, list_item):
         video_info['year'] = item['year']
         video_info['plot'] = item['plot']
         video_info['cast'] = [actor['name'] for actor in item['cast']]
-        video_info['director'] = u', '.join(item['director'])
+        video_info['studio'] = u', '.join(item['studio'])
     elif content == 'seasons':
+        video_info['title'] = item['label']
         video_info['tvshowtitle'] = item['showtitle']
+        video_info['season'] = item['season']
     elif content == 'episodes':
         video_info['tvshowtitle'] = item['showtitle']
         video_info['plot'] = item['plot']
         video_info['cast'] = [actor['name'] for actor in item['cast']]
         video_info['director'] = u', '.join(item['director'])
         video_info['premiered'] = item['firstaired']
+        video_info['season'] = item['season']
+        video_info['episode'] = item['episode']
     if content.endswith('movies'):
+        video_info['director'] = u', '.join(item['director'])
         video_info['imdbnumber'] = str(item['movieid'])
     elif content.endswith('episodes'):
         video_info['imdbnumber'] = str(item['tvshowid'])
@@ -74,27 +79,33 @@ def _set_art(content, item, list_item):
         )
         list_item['art']['banner'] = image_url + quote_plus(
             item['art'].get('season.banner') or
+            item['art'].get('tvshow.banner') or
             item['art'].get('banner', '')
         )
         list_item['fanart'] = image_url + quote_plus(
+            item['art'].get('season.fanart') or
             item['art'].get('tvshow.fanart') or
             item['art'].get('fanart', '')
         )
     elif content.endswith('episodes'):
         list_item['thumb'] = image_url + quote_plus(
             item['art'].get('thumb', '') or
+            item['art'].get('season.poster') or
             item['art'].get('tvshow.poster') or
             item['art'].get('poster', '')
         )
         list_item['poster'] = image_url + quote_plus(
+            item['art'].get('season.poster') or
             item['art'].get('tvshow.poster') or
             item['art'].get('poster', '')
         )
         list_item['art']['banner'] = image_url + quote_plus(
+            item['art'].get('season.banner') or
             item['art'].get('tvshow.banner') or
             item['art'].get('banner', '')
         )
         list_item['fanart'] = image_url + quote_plus(
+            item['art'].get('season.fanart') or
             item['art'].get('tvshow.fanart') or
             item['art'].get('fanart', '')
         )
@@ -128,6 +139,9 @@ def _show_library_items(items, content):
             list_item['is_playable'] = True
         elif content == 'tvshows':
             list_item['url'] = plugin.get_url(action='library_items', content='seasons', tvshowid=item['tvshowid'])
+        elif content == 'seasons':
+            list_item['url'] = plugin.get_url(action='library_items', content='episodes',
+                                              tvshowid=item['tvshowid'], season=item['season'])
         yield list_item
 
 
@@ -145,6 +159,17 @@ def library_items(params):
         elif content == 'tvshows':
             items = ml.get_tvshows()
             plugin_content = 'tvshows'
+        elif content == 'seasons':
+            items = ml.get_seasons(int(params['tvshowid']))
+            plugin_content = 'tvshows'
+            if plugin.flatten_tvshows == 2 or (plugin.flatten_tvshows == 1 and len(items) == 1):
+                items = ml.get_episodes(int(params['tvshowid']), items[0]['season'])
+                content = plugin_content = 'episodes'
+        elif content.endswith('episodes'):
+            items = ml.get_episodes(int(params.get('tvshowid', -1)),
+                                    int(params.get('season', -1)),
+                                    content.startswith('recent'))
+            content = plugin_content = 'episodes'
     except ml.ConnectionError:
         dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')
     except ml.NoDataError:

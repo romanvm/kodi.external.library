@@ -74,7 +74,7 @@ def get_movies(recent=False):
     params = {
         'properties': [
             'file', 'playcount', 'resume', 'plot',
-            'director', 'genre', 'cast', 'imdbnumber', 'year'
+            'director', 'genre', 'cast', 'imdbnumber', 'year', 'studio'
         ],
         'sort': sort
     }
@@ -92,7 +92,7 @@ def get_tvshows():
     """
     method = 'VideoLibrary.GetTVShows'
     params = {
-        'properties': ['plot', 'genre', 'cast', 'imdbnumber'],
+        'properties': ['plot', 'genre', 'cast', 'imdbnumber', 'year', 'studio'],
         'sort': {'order': 'ascending', 'method': 'label'},
     }
     result = _get_info(method, params)
@@ -131,7 +131,7 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
     params = {
         'properties': [
             'showtitle', 'season', 'episode', 'title', 'tvshowid',
-            'cast', 'firstaired', 'director', 'plot', 'file',
+            'cast', 'firstaired', 'director', 'plot', 'file', 'playcount', 'resume'
         ],
     }
     if recent:

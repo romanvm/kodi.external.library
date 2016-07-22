@@ -42,3 +42,15 @@ msgstr ""
 msgctxt "#32008"
 msgid "Remote Kodi library contains no relevant data!"
 msgstr ""
+
+msgctxt "#32009"
+msgid "Flatten TV show seasons"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Mark as watched"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Mark as unwatched"
+msgstr ""

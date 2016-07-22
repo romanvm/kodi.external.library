@@ -12,7 +12,7 @@
     <setting id="show_tvshows" type="bool"
       label="32005" default="true" />
     <setting id="flatten_tvshows" type="enum" lvalues="20420|20421|20422"
-      label="20412" default="1" enable="eq(-1,true)" />
+      label="32009" default="1" enable="eq(-1,true)" />
     <setting id="show_recent_episodes" type="bool"
       label="32006" default="true" enable="eq(-2,true)" />
   </category>

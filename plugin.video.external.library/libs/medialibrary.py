@@ -7,7 +7,7 @@ from collections import namedtuple
 import requests
 from simpleplugin import Plugin
 
-plugin = Plugin()
+plugin = Plugin('plugin.video.external.library')
 kodi_url = 'http://{host}:{port}'.format(host=plugin.kodi_host, port=plugin.kodi_port)
 TVShowDetails = namedtuple('TVShowDetails', ['title', 'tvdbid'])
 
@@ -146,3 +146,16 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
     if not result.get('episodes'):
         raise NoDataError
     return result['episodes']
+
+
+def update_item_playcount(content, id_, playcount):
+    """
+    Update item's playcount
+    """
+    if content.endswith('movies'):
+        method = 'VideoLibrary.SetMovieDetails'
+        params = {'movieid': id_, 'playcount': playcount}
+    else:
+        method = 'VideoLibrary.SetEpisodeDetails'
+        params = {'epdisodeid': id_, 'playcount': playcount}
+    _send_json_rpc(method, params)

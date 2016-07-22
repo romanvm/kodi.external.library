@@ -3,6 +3,7 @@
 # Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
+import os
 from urllib import quote_plus
 from xbmcgui import Dialog
 from simpleplugin import Plugin
@@ -12,6 +13,7 @@ plugin = Plugin()
 _ = plugin.initialize_gettext()
 dialog = Dialog()
 image_url = ml.kodi_url + '/image/'
+commands = os.path.join(plugin.path, 'libs', 'commands.py')
 
 
 def root(params):
@@ -58,7 +60,7 @@ def _set_info(content, item, list_item):
         video_info['director'] = u', '.join(item['director'])
         video_info['imdbnumber'] = str(item['movieid'])
     elif content.endswith('episodes'):
-        video_info['imdbnumber'] = str(item['tvshowid'])
+        video_info['imdbnumber'] = str(item['episodeid'])
     list_item['info']['video'] = video_info
 
 
@@ -132,7 +134,24 @@ def _show_library_items(items, content):
         _set_info(content, item, list_item)
         _set_art(content, item, list_item)
         if content.endswith('movies') or content.endswith('episodes'):
-            list_item['context_menu'] = [('Toggle watched', 'Action(ToggleWatched)')]
+            if item['playcount']:
+                caption = '[COLOR=yellow]{0}[/COLOR]'.format(_('Mark as unwatched'))
+                playcount = 0
+            else:
+                caption = '[COLOR=green]{0}[/COLOR]'.format(_('Mark as watched'))
+                playcount = 1
+            if content.endswith('movies'):
+                item_id = item['movieid']
+            else:
+                item_id = item['episodeid']
+            list_item['context_menu'] = [(
+                caption, 'RunScript({commands},update_playcount,{content},{id},{playcount})'.format(
+                    commands=commands,
+                    content=content,
+                    id=item_id,
+                    playcount=playcount
+                )
+            )]
             list_item['info']['video']['playcount'] = item['playcount']
             list_item['url'] = ml.kodi_url + '/vfs/' + quote_plus(item['file'])
             # list_item['url'] = plugin.get_url(action='play', file=item['file'])
@@ -162,7 +181,7 @@ def library_items(params):
         elif content == 'seasons':
             items = ml.get_seasons(int(params['tvshowid']))
             plugin_content = 'tvshows'
-            if plugin.flatten_tvshows == 2 or (plugin.flatten_tvshows == 1 and len(items) == 1):
+            if (plugin.flatten_tvshows == 1 and len(items) == 1) or plugin.flatten_tvshows == 2:
                 items = ml.get_episodes(int(params['tvshowid']), items[0]['season'])
                 content = plugin_content = 'episodes'
         elif content.endswith('episodes'):

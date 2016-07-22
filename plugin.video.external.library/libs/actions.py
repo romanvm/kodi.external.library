@@ -4,7 +4,7 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
 import os
-from urllib import quote_plus
+from urllib import quote
 from xbmcgui import Dialog
 from simpleplugin import Plugin
 import medialibrary as ml
@@ -58,9 +58,9 @@ def _set_info(content, item, list_item):
         video_info['episode'] = item['episode']
     if content.endswith('movies'):
         video_info['director'] = u', '.join(item['director'])
-        video_info['imdbnumber'] = str(item['movieid'])
+        video_info['tagline'] = str(item['movieid'])
     elif content.endswith('episodes'):
-        video_info['imdbnumber'] = str(item['episodeid'])
+        video_info['tagline'] = str(item['episodeid'])
     list_item['info']['video'] = video_info
 
 
@@ -69,44 +69,44 @@ def _set_art(content, item, list_item):
     Set list item artwork
     """
     if content == 'tvshows':
-        list_item['art']['banner'] = image_url + quote_plus(item['art'].get('banner'), '')
+        list_item['art']['banner'] = image_url + quote(item['art'].get('banner'), '')
     if content.endswith('movies') or content == 'tvshows':
-        list_item['thumb'] = list_item['art']['poster'] = image_url + quote_plus(item['art'].get('poster', ''))
-        list_item['fanart'] = image_url + quote_plus(item['art'].get('fanart', ''))
+        list_item['thumb'] = list_item['art']['poster'] = image_url + quote(item['art'].get('poster', ''))
+        list_item['fanart'] = image_url + quote(item['art'].get('fanart', ''))
     elif content == 'seasons':
-        list_item['thumb'] = list_item['art']['poster'] = image_url + quote_plus(
+        list_item['thumb'] = list_item['art']['poster'] = image_url + quote(
             item['art'].get('season.poster') or
             item['art'].get('tvshow.poster') or
             item['art'].get('poster', '')
         )
-        list_item['art']['banner'] = image_url + quote_plus(
+        list_item['art']['banner'] = image_url + quote(
             item['art'].get('season.banner') or
             item['art'].get('tvshow.banner') or
             item['art'].get('banner', '')
         )
-        list_item['fanart'] = image_url + quote_plus(
+        list_item['fanart'] = image_url + quote(
             item['art'].get('season.fanart') or
             item['art'].get('tvshow.fanart') or
             item['art'].get('fanart', '')
         )
     elif content.endswith('episodes'):
-        list_item['thumb'] = image_url + quote_plus(
+        list_item['thumb'] = image_url + quote(
             item['art'].get('thumb', '') or
             item['art'].get('season.poster') or
             item['art'].get('tvshow.poster') or
             item['art'].get('poster', '')
         )
-        list_item['poster'] = image_url + quote_plus(
+        list_item['poster'] = image_url + quote(
             item['art'].get('season.poster') or
             item['art'].get('tvshow.poster') or
             item['art'].get('poster', '')
         )
-        list_item['art']['banner'] = image_url + quote_plus(
+        list_item['art']['banner'] = image_url + quote(
             item['art'].get('season.banner') or
             item['art'].get('tvshow.banner') or
             item['art'].get('banner', '')
         )
-        list_item['fanart'] = image_url + quote_plus(
+        list_item['fanart'] = image_url + quote(
             item['art'].get('season.fanart') or
             item['art'].get('tvshow.fanart') or
             item['art'].get('fanart', '')
@@ -153,7 +153,7 @@ def _show_library_items(items, content):
                 )
             )]
             list_item['info']['video']['playcount'] = item['playcount']
-            list_item['url'] = ml.kodi_url + '/vfs/' + quote_plus(item['file'])
+            list_item['url'] = ml.kodi_url + '/vfs/' + quote(item['file'])
             # list_item['url'] = plugin.get_url(action='play', file=item['file'])
             list_item['is_playable'] = True
         elif content == 'tvshows':
@@ -202,7 +202,7 @@ def play(params):
     """
     Play video
     """
-    return ml.kodi_url + '/vfs/' + quote_plus(params['file'])
+    return ml.kodi_url + '/vfs/' + quote(params['file'])
 
 
 plugin.actions['root'] = root

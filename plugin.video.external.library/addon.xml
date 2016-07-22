@@ -11,6 +11,8 @@ provider-name="Roman V.M.">
 <extension point="xbmc.python.pluginsource" library="main.py">
   <provides>video</provides>
 </extension>
+<extension point="xbmc.service" library="service.py"
+    start="[login|startup]" />
 <extension point="xbmc.addon.metadata">
   <summary lang="en">Kodi External Video Library</summary>
   <description lang="en">A plugin that allows to browse video library on an external Kodi instance.</description>

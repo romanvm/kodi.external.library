@@ -40,10 +40,10 @@ class MyPlayer(xbmc.Player):
     def _update_watched(self):
         xbmc.log('%%%%%%%%%%%%%%%%%%%%%%%% {}'.format(self.info_tag.getIMDBNumber()))
 
-
-player = MyPlayer()
-
-while not xbmc.abortRequested:
-    xbmc.sleep(200)
-    if player.isPlaying():
-        player.update_time()
+#
+# player = MyPlayer()
+#
+# while not xbmc.abortRequested:
+#     xbmc.sleep(200)
+#     if player.isPlaying():
+#         player.update_time()

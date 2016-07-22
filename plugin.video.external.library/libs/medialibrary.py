@@ -157,5 +157,5 @@ def update_item_playcount(content, id_, playcount):
         params = {'movieid': id_, 'playcount': playcount}
     else:
         method = 'VideoLibrary.SetEpisodeDetails'
-        params = {'epdisodeid': id_, 'playcount': playcount}
+        params = {'episodeid': id_, 'playcount': playcount}
     _send_json_rpc(method, params)

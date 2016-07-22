@@ -58,9 +58,10 @@ def _set_info(content, item, list_item):
         video_info['episode'] = item['episode']
     if content.endswith('movies'):
         video_info['director'] = u', '.join(item['director'])
-        video_info['tagline'] = str(item['movieid'])
-    elif content.endswith('episodes'):
-        video_info['tagline'] = str(item['episodeid'])
+    if content == 'recent_episodes':
+        list_item['label'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
+    else:
+        list_item['label'] = item['label']
     list_item['info']['video'] = video_info
 
 
@@ -130,7 +131,7 @@ def _show_library_items(items, content):
             'thumb': 'DefaultRecentlyAddedMovies.png'
         }
     for item in items:
-        list_item = {'label': item['label'], 'art': {}, 'info': {}}
+        list_item = {'art': {}, 'info': {}}
         _set_info(content, item, list_item)
         _set_art(content, item, list_item)
         if content.endswith('movies') or content.endswith('episodes'):

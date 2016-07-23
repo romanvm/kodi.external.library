@@ -124,7 +124,7 @@ def _show_library_items(items, content):
         yield {
             'label': '[{0}]'.format(_('Recently added episodes')),
             'url'  : plugin.get_url(action='library_items', content='recent_episodes'),
-            'thumb': 'DefaultRecentlyAddedMovies.png'
+            'thumb': 'DefaultRecentlyAddedEpisodes.png'
         }
     for item in items:
         list_item = {'label': item['label'], 'art': {}, 'info': {}}

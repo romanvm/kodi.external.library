@@ -196,13 +196,5 @@ def library_items(params):
     return plugin.create_listing(listing, content=plugin_content)
 
 
-def play(params):
-    """
-    Play video
-    """
-    return ml.kodi_url + '/vfs/' + quote(params['file'])
-
-
 plugin.actions['root'] = root
 plugin.actions['library_items'] = library_items
-plugin.actions['play'] = play

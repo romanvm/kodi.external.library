@@ -56,7 +56,6 @@ def _set_info(content, item, list_item):
         video_info['episode'] = item['episode']
     if content.endswith('movies'):
         video_info['director'] = u', '.join(item['director'])
-    plugin.log('$$$$$$$$$$$$$ content: {}'.format(content))
     if content == 'recent_episodes':
         list_item['label'] = video_info['title'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
     list_item['info']['video'] = video_info

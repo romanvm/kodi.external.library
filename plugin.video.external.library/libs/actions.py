@@ -36,19 +36,17 @@ def _set_info(content, item, list_item):
     """
     Set list item info
     """
-    video_info = {}
+    video_info = {'title': item['label']}
     if content.endswith('movies') or content == 'tvshows':
-        video_info['title'] = item['label']
         video_info['genre'] = u', '.join(item['genre'])
         video_info['year'] = item['year']
         video_info['plot'] = item['plot']
         video_info['cast'] = [actor['name'] for actor in item['cast']]
         video_info['studio'] = u', '.join(item['studio'])
     elif content == 'seasons':
-        video_info['title'] = item['label']
         video_info['tvshowtitle'] = item['showtitle']
         video_info['season'] = item['season']
-    elif content == 'episodes':
+    elif content.endswith('episodes'):
         video_info['tvshowtitle'] = item['showtitle']
         video_info['plot'] = item['plot']
         video_info['cast'] = [actor['name'] for actor in item['cast']]
@@ -58,10 +56,9 @@ def _set_info(content, item, list_item):
         video_info['episode'] = item['episode']
     if content.endswith('movies'):
         video_info['director'] = u', '.join(item['director'])
+    plugin.log('$$$$$$$$$$$$$ content: {}'.format(content))
     if content == 'recent_episodes':
-        list_item['label'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
-    else:
-        list_item['label'] = item['label']
+        list_item['label'] = video_info['title'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
     list_item['info']['video'] = video_info
 
 
@@ -131,7 +128,7 @@ def _show_library_items(items, content):
             'thumb': 'DefaultRecentlyAddedMovies.png'
         }
     for item in items:
-        list_item = {'art': {}, 'info': {}}
+        list_item = {'label': item['label'], 'art': {}, 'info': {}}
         _set_info(content, item, list_item)
         _set_art(content, item, list_item)
         if content.endswith('movies') or content.endswith('episodes'):
@@ -162,6 +159,7 @@ def _show_library_items(items, content):
         elif content == 'seasons':
             list_item['url'] = plugin.get_url(action='library_items', content='episodes',
                                               tvshowid=item['tvshowid'], season=item['season'])
+        plugin.log('List item: {0}'.format(list_item))
         yield list_item
 
 
@@ -189,7 +187,7 @@ def library_items(params):
             items = ml.get_episodes(int(params.get('tvshowid', -1)),
                                     int(params.get('season', -1)),
                                     content.startswith('recent'))
-            content = plugin_content = 'episodes'
+            plugin_content = 'episodes'
     except ml.ConnectionError:
         dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')
     except ml.NoDataError:

@@ -43,6 +43,8 @@ def _set_info(content, item, list_item):
         video_info['plot'] = item['plot']
         video_info['cast'] = [actor['name'] for actor in item['cast']]
         video_info['studio'] = u', '.join(item['studio'])
+        if content.endswith('movies'):
+            video_info['director'] = u', '.join(item['director'])
     elif content == 'seasons':
         video_info['tvshowtitle'] = item['showtitle']
         video_info['season'] = item['season']
@@ -54,10 +56,8 @@ def _set_info(content, item, list_item):
         video_info['premiered'] = item['firstaired']
         video_info['season'] = item['season']
         video_info['episode'] = item['episode']
-    if content.endswith('movies'):
-        video_info['director'] = u', '.join(item['director'])
-    if content == 'recent_episodes':
-        list_item['label'] = video_info['title'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
+        if content == 'recent_episodes':
+            list_item['label'] = video_info['title'] = u'{0} - {1}'.format(item['showtitle'], item['label'])
     list_item['info']['video'] = video_info
 
 
@@ -65,11 +65,22 @@ def _set_art(content, item, list_item):
     """
     Set list item artwork
     """
-    if content == 'tvshows':
-        list_item['art']['banner'] = image_url + quote(item['art'].get('banner'), '')
-    if content.endswith('movies') or content == 'tvshows':
+    if content.endswith('movies'):
         list_item['thumb'] = list_item['art']['poster'] = image_url + quote(item['art'].get('poster', ''))
         list_item['fanart'] = image_url + quote(item['art'].get('fanart', ''))
+    elif content == 'tvshows':
+        list_item['thumb'] = list_item['art']['poster'] = image_url + quote(
+            item['art'].get('tvshow.poster') or
+            item['art'].get('poster', '')
+        )
+        list_item['art']['banner'] = image_url + quote(
+            item['art'].get('tvshow.banner') or
+            item['art'].get('banner', '')
+        )
+        list_item['fanart'] = image_url + quote(
+            item['art'].get('tvshow.fanart') or
+            item['art'].get('fanart')
+        )
     elif content == 'seasons':
         list_item['thumb'] = list_item['art']['poster'] = image_url + quote(
             item['art'].get('season.poster') or

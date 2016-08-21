@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.external.library"
-version="0.0.1"
+version="0.0.2"
 name="Kodi External Video Library"
 provider-name="Roman V.M.">
 <requires>

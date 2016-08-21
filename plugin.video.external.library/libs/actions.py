@@ -16,6 +16,7 @@ image_url = ml.kodi_url + '/image/'
 commands = os.path.join(plugin.path, 'libs', 'commands.py')
 
 
+@plugin.action()
 def root(params):
     """Root action"""
     if plugin.show_movies:
@@ -173,6 +174,7 @@ def _show_library_items(items, content):
         yield list_item
 
 
+@plugin.action()
 def library_items(params):
     """
     Display the list of movies or TV shows
@@ -205,7 +207,3 @@ def library_items(params):
     else:
         listing = _show_library_items(items, content)
     return plugin.create_listing(listing, content=plugin_content)
-
-
-plugin.actions['root'] = root
-plugin.actions['library_items'] = library_items

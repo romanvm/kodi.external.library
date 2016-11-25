@@ -8,7 +8,11 @@ import xbmcgui
 
 
 class MemStorage(object):
+    """
+    Stores a picklable Python object as a Kodi window property
 
+    This class can be used as an inter-process in-memory storage
+    """
     def __init__(self, window_id=10000):
         self._window = xbmcgui.Window(window_id)
 

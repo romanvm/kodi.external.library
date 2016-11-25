@@ -163,7 +163,6 @@ def _show_library_items(items, content):
             )]
             list_item['info']['video']['playcount'] = item['playcount']
             list_item['url'] = ml.kodi_url + '/vfs/' + quote(item['file'])
-            # list_item['url'] = plugin.get_url(action='play', file=item['file'])
             list_item['is_playable'] = True
         elif content == 'tvshows':
             list_item['url'] = plugin.get_url(action='library_items', content='seasons', tvshowid=item['tvshowid'])

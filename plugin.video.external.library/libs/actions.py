@@ -186,7 +186,6 @@ def library_items(params):
     try:
         if content.endswith('movies'):
             items = ml.get_movies(recent=content.startswith('recent'))
-            storage['__list__'] = items
             plugin_content = 'movies'
         elif content == 'tvshows':
             items = ml.get_tvshows()

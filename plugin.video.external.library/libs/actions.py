@@ -201,12 +201,12 @@ def library_items(params):
             items = ml.get_episodes(int(params.get('tvshowid', -1)),
                                     int(params.get('season', -1)),
                                     content.startswith('recent'))
-            storage['__list__'] = items
             plugin_content = 'episodes'
     except ml.ConnectionError:
         dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')
     except ml.NoDataError:
         dialog.notification(plugin.id, _('Remote Kodi library contains no relevant data!'), icon='error')
     else:
+        storage['__list__'] = items
         listing = _show_library_items(items, content)
     return plugin.create_listing(listing, content=plugin_content)

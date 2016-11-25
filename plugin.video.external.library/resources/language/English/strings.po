@@ -54,3 +54,7 @@ msgstr ""
 msgctxt "#32011"
 msgid "Mark as unwatched"
 msgstr ""
+
+msgctxt "#32012"
+msgid "Watched status threshold"
+msgstr ""

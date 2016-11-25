@@ -15,5 +15,6 @@
       label="32009" default="1" enable="eq(-1,true)" />
     <setting id="show_recent_episodes" type="bool"
       label="32006" default="true" enable="eq(-2,true)" />
+    <setting label="32012" type="slider" id="watched_threshold" default="0.97" range="0.9,0.1,1.0" option="float" />
   </category>
 </settings>

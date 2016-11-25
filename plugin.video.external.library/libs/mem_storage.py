@@ -3,7 +3,6 @@
 # Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
 
 import cPickle as pickle
-from base64 import standard_b64encode
 import xbmcgui
 
 
@@ -19,28 +18,13 @@ class MemStorage(object):
     def __getitem__(self, item):
         self.check_key_type(item)
         try:
-            return pickle.loads(self._window.getProperty(standard_b64encode(item)))
+            return pickle.loads(self._window.getProperty(item))
         except (EOFError, KeyError, pickle.PickleError):
             raise KeyError('Item "{0}" not found or invalid item!'.format(item))
 
     def __setitem__(self, key, value):
         self.check_key_type(key)
-        self._window.setProperty(standard_b64encode(key), pickle.dumps(value))
-
-    def __contains__(self, item):
-        self.check_key_type(item)
-        try:
-            self[item]
-        except KeyError:
-            return False
-        return True
-
-    def get(self, item, default=None):
-        self.check_key_type(item)
-        try:
-            return self[item]
-        except KeyError:
-            return default
+        self._window.setProperty(key, pickle.dumps(value))
 
     @staticmethod
     def check_key_type(key):

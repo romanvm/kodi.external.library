@@ -8,10 +8,12 @@ from urllib import quote
 from xbmcgui import Dialog
 from simpleplugin import Plugin
 import medialibrary as ml
+from mem_storage import MemStorage
 
 plugin = Plugin()
 _ = plugin.initialize_gettext()
 dialog = Dialog()
+storage = MemStorage()
 image_url = ml.kodi_url + '/image/'
 commands = os.path.join(plugin.path, 'libs', 'commands.py')
 
@@ -184,6 +186,7 @@ def library_items(params):
     try:
         if content.endswith('movies'):
             items = ml.get_movies(recent=content.startswith('recent'))
+            storage['__list__'] = items
             plugin_content = 'movies'
         elif content == 'tvshows':
             items = ml.get_tvshows()
@@ -198,6 +201,7 @@ def library_items(params):
             items = ml.get_episodes(int(params.get('tvshowid', -1)),
                                     int(params.get('season', -1)),
                                     content.startswith('recent'))
+            storage['__list__'] = items
             plugin_content = 'episodes'
     except ml.ConnectionError:
         dialog.notification(plugin.id, _('Unable to connect to the remote Kodi host!'), icon='error')

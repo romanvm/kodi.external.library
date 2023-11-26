@@ -19,7 +19,7 @@ class MemStorage:
 
     def __getitem__(self, key):
         try:
-            b64_value = pickle.loads(self._window.getProperty(key))
+            b64_value = self._window.getProperty(key)
             return pickle.loads(base64.b64decode(b64_value))
         except (EOFError, KeyError, ValueError, pickle.PickleError) as exc:
             raise KeyError(f'Item "{key}" not found or invalid item!') from exc

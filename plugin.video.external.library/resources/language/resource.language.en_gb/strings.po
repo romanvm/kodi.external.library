@@ -70,3 +70,7 @@ msgstr ""
 msgctxt "#32015"
 msgid "Kodi hostname or IP address (without protocol)"
 msgstr ""
+
+msgctxt "#32016"
+msgid "Kodi Medialibrary on {kodi_host}"
+msgstr ""

@@ -40,10 +40,12 @@
           <hidden>true</hidden>
         </control>
       </setting>
+      <setting id="show_movies" type="boolean" label="32003" help="">
+        <level>0</level>
+        <default>true</default>
+        <control type="toggle"/>
+      </setting>
       <!--
-      <setting id="show_movies" type="bool"
-        label="32003" default="true" />
-
       <setting id="show_recent_movies" type="bool"
         label="32004" default="true" enable="eq(-1,true)" />
 

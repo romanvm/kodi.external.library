@@ -34,10 +34,13 @@ def get_url(**kwargs):
 
 def root():
     """Root action"""
+    xbmcplugin.setPluginCategory(HANDLE,
+                                 _('Kodi Medialibrary on {kodi_host}').format(
+                                     kodi_host=ADDON.getSetting('kodi_host')))
     if ADDON.getSettingBool('show_movies'):
         list_item = ListItem(f'[{_("Movies")}]')
         list_item.setArt({'icon': 'DefaultMovies.png', 'thumb': 'DefaultMovies.png'})
-        url = get_url(content='movies')
+        url = get_url(mediatype='movie')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
     # if ADDON.getSettingBool('show_tvshows'):
     #     list_item = ListItem(f'[{_("TV Shows")}]')
@@ -53,51 +56,37 @@ def _set_art(list_item: ListItem, raw_art: Dict[str, str]) -> None:
 
 def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str) -> None:
     info_tag.setMediaType(mediatype)
-    year = media_info.get('year')
-    if year:
+    if year := media_info.get('year'):
         info_tag.setYear(year)
-    episode = media_info.get('episode')
-    if episode:
+    if episode := media_info.get('episode'):
         info_tag.setEpisode(episode)
-    season = media_info.get('season')
-    if season:
+    if season := media_info.get('season'):
         info_tag.setSeason(season)
-    ratings = media_info.get('ratings')
-    if ratings:
+    if ratings := media_info.get('ratings'):
         for rating_type, rating_info in ratings.items():
             info_tag.setRating(rating=rating_info.get('rating', 0),
                                votes=rating_info.get('votes', 0),
                                type=rating_type,
                                isdefault=bool(rating_info.get('default')))
-    playcount = media_info.get('playcount')
-    if playcount is not None:
+    if (playcount := media_info.get('playcount')) is not None:
         info_tag.setPlaycount(playcount)
-    mpaa = media_info.get('mpaa')
-    if mpaa:
+    if mpaa := media_info.get('mpaa'):
         info_tag.setMpaa(mpaa)
-    plot = media_info.get('plot')
-    if plot:
+    if plot := media_info.get('plot'):
         info_tag.setPlot(plot)
-    title = media_info.get('title')
-    if title:
+    if title := media_info.get('title'):
         info_tag.setTitle(title)
-    genres = media_info.get('genre')
-    if genres:
+    if genres := media_info.get('genre'):
         info_tag.setGenres(genres)
-    countries = media_info.get('country')
-    if countries:
+    if countries := media_info.get('country'):
         info_tag.setCountries(countries)
-    directors = media_info.get('director')
-    if directors:
+    if directors := media_info.get('director'):
         info_tag.setDirectors(directors)
-    studios = media_info.get('studios')
-    if studios:
+    if studios := media_info.get('studios'):
         info_tag.setStudios(studios)
-    writers = media_info.get('writer')
-    if writers:
+    if writers := media_info.get('writer'):
         info_tag.setWriters(writers)
-    cast = media_info.get('cast')
-    if cast:
+    if cast := media_info.get('cast'):
         actors = []
         for actor_info in cast:
             actor_thumbnail = actor_info.get('thumbnail', '')
@@ -111,11 +100,9 @@ def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str
             ))
         if actors:
             info_tag.setCast(actors)
-    premiered = media_info.get('premiered')
-    if premiered:
+    if premiered := media_info.get('premiered'):
         info_tag.setPremiered(premiered)
-    resume = media_info.get('resume')
-    if resume:
+    if resume := media_info.get('resume'):
         info_tag.setResumePoint(time=resume.get('position', 0.0), totaltime=resume.get('total', 0.0))
 
 
@@ -124,9 +111,8 @@ def show_movies():
     xbmcplugin.setContent(HANDLE, 'movies')
     movies = medialibrary.get_movies()
     for mov in movies:
-        list_item = ListItem(mov['label'])
-        art = mov.get('art')
-        if art:
+        list_item = ListItem(mov.get('title') or mov.get('label'))
+        if art := mov.get('art'):
             _set_art(list_item, art)
         info_tag = list_item.getVideoInfoTag()
         _set_info(info_tag, mov, 'movie')
@@ -137,6 +123,8 @@ def show_movies():
 def router(paramstring):
     params = dict(parse_qsl(paramstring))
     logger.debug('Called addon with params: %s', str(sys.argv))
-    if 'content' not in params:
+    if 'mediatype' not in params:
         root()
+    elif params['mediatype'] == 'movie' and not params.get('recent'):
+        show_movies()
     xbmcplugin.endOfDirectory(HANDLE)

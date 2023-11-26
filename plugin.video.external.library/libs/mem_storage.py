@@ -2,11 +2,13 @@
 # Created on: 25.11.2016
 # Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
 
-import cPickle as pickle
+import base64
+import pickle
+
 import xbmcgui
 
 
-class MemStorage(object):
+class MemStorage:
     """
     Stores a picklable Python object as a Kodi window property
 
@@ -15,18 +17,13 @@ class MemStorage(object):
     def __init__(self, window_id=10000):
         self._window = xbmcgui.Window(window_id)
 
-    def __getitem__(self, item):
-        self.check_key_type(item)
+    def __getitem__(self, key):
         try:
-            return pickle.loads(self._window.getProperty(item))
-        except (EOFError, KeyError, pickle.PickleError):
-            raise KeyError('Item "{0}" not found or invalid item!'.format(item))
+            b64_value = pickle.loads(self._window.getProperty(key))
+            return pickle.loads(base64.b64decode(b64_value))
+        except (EOFError, KeyError, ValueError, pickle.PickleError) as exc:
+            raise KeyError(f'Item "{key}" not found or invalid item!') from exc
 
     def __setitem__(self, key, value):
-        self.check_key_type(key)
-        self._window.setProperty(key, pickle.dumps(value))
-
-    @staticmethod
-    def check_key_type(key):
-        if not isinstance(key, str):
-            raise TypeError('Storage key must be of str type!')
+        pickled_value = pickle.dumps(value)
+        self._window.setProperty(key, base64.b64encode(pickled_value).decode('ascii'))

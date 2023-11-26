@@ -4,16 +4,13 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
 from collections import namedtuple
-import requests
-from simpleplugin import Plugin
+from pprint import pformat
 
-plugin = Plugin('plugin.video.external.library')
-kodi_url = 'http://{host}:{port}'.format(host=plugin.kodi_host, port=plugin.kodi_port)
+from libs import simple_requests as requests
+from libs.kodi_service import ADDON, logger, get_kodi_url
+
+KODI_URL = get_kodi_url()
 TVShowDetails = namedtuple('TVShowDetails', ['title', 'tvdbid'])
-
-
-class ConnectionError(Exception):
-    pass
 
 
 class NoDataError(Exception):
@@ -34,12 +31,17 @@ def _send_json_rpc(method, params=None):
     request = {'jsonrpc': '2.0', 'method': method, 'id': '1'}
     if params is not None:
         request['params'] = params
-    plugin.log('JSON-RPC request: {0}'.format(request))
+    logger.debug('JSON-RPC request: %s', request)
+    auth = None
+    login = ADDON.getSetting('kodi_login')
+    password = ADDON.getSetting('kodi_password')
+    if login:
+        auth = (login, password)
     try:
-        json_reply = requests.post(kodi_url + '/jsonrpc', json=request).json()
-    except requests.RequestException:
-        raise ConnectionError
-    plugin.log('JSON-RPC reply: {0}'.format(json_reply))
+        json_reply = requests.post(KODI_URL + '/jsonrpc', json=request, auth=auth).json()
+    except requests.RequestException as exc:
+        raise ConnectionError from exc
+    logger.debug('JSON-RPC reply: %s', pformat(json_reply))
     return json_reply['result']
 
 
@@ -74,7 +76,7 @@ def get_movies(recent=False):
     params = {
         'properties': [
             'file', 'playcount', 'resume', 'plot',
-            'director', 'genre', 'cast', 'imdbnumber', 'year', 'studio'
+            'director', 'genre', 'cast', 'art', 'year', 'studio'
         ],
         'sort': sort
     }
@@ -92,7 +94,7 @@ def get_tvshows():
     """
     method = 'VideoLibrary.GetTVShows'
     params = {
-        'properties': ['plot', 'genre', 'cast', 'imdbnumber', 'year', 'studio'],
+        'properties': ['plot', 'genre', 'cast', 'art', 'year', 'studio'],
         'sort': {'order': 'ascending', 'method': 'label'},
     }
     result = _get_info(method, params)
@@ -111,7 +113,7 @@ def get_seasons(tvshowid):
     method = 'VideoLibrary.GetSeasons'
     params = {
         'tvshowid': tvshowid,
-        'properties': ['showtitle', 'season', 'tvshowid'],
+        'properties': ['showtitle', 'season', 'tvshowid', 'art'],
         'sort': {'order': 'ascending', 'method': 'season'},
     }
     result = _get_info(method, params)
@@ -126,12 +128,13 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
 
     :param tvshowid:
     :param season:
+    :param recent:
     :return:
     """
     params = {
         'properties': [
             'showtitle', 'season', 'episode', 'title', 'tvshowid',
-            'cast', 'firstaired', 'director', 'plot', 'file', 'playcount', 'resume'
+            'cast', 'firstaired', 'director', 'plot', 'file', 'playcount', 'resume', 'art'
         ],
     }
     if recent:

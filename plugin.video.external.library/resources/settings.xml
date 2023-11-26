@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
   <category label="32000">
-    <setting id="kodi_host" type="text"
-      label="32001" default="" />
+    <setting id="kodi_host" type="string" label="32001" help="">
+      <level>0</level>
+      <default/>
+      <constraints>
+        <allowempty>true</allowempty>
+      </constraints>
+      <control type="edit" format="string">
+        <heading>32001</heading>
+      </control>
+    </setting>
     <setting id="kodi_port" type="number"
       label="32002" default="8080" />
     <setting id="show_movies" type="bool"

@@ -1,28 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings>
-  <category label="32000">
-    <setting id="kodi_host" type="string" label="32001" help="">
-      <level>0</level>
-      <default/>
-      <constraints>
-        <allowempty>true</allowempty>
-      </constraints>
-      <control type="edit" format="string">
-        <heading>32001</heading>
-      </control>
-    </setting>
-    <setting id="kodi_port" type="number"
-      label="32002" default="8080" />
-    <setting id="show_movies" type="bool"
-      label="32003" default="true" />
-    <setting id="show_recent_movies" type="bool"
-      label="32004" default="true" enable="eq(-1,true)" />
-    <setting id="show_tvshows" type="bool"
-      label="32005" default="true" />
-    <setting id="flatten_tvshows" type="enum" lvalues="20420|20421|20422"
-      label="32009" default="1" enable="eq(-1,true)" />
-    <setting id="show_recent_episodes" type="bool"
-      label="32006" default="true" enable="eq(-2,true)" />
-    <setting label="32012" type="slider" id="watched_threshold" default="0.97" range="0.9,0.1,1.0" option="float" />
-  </category>
+<settings version="1">
+  <section id="plugin.video.external.library">
+    <category id="general" label="32000">
+      <setting id="kodi_host" type="string" label="32001" help="32015">
+        <level>0</level>
+        <default/>
+        <constraints>
+          <allowempty>true</allowempty>
+        </constraints>
+        <control type="edit" format="string">
+          <heading>32001</heading>
+        </control>
+      </setting>
+      <setting id="kodi_port" type="integer" label="32002" help="">
+        <level>0</level>
+        <default>8080</default>
+        <control type="edit" format="integer">
+          <heading>32002</heading>
+        </control>
+      </setting>
+      <setting id="kodi_login" type="string" label="32013" help="">
+        <level>0</level>
+        <default/>
+        <constraints>
+          <allowempty>true</allowempty>
+        </constraints>
+        <control type="edit" format="string">
+          <heading>32013</heading>
+        </control>
+      </setting>
+      <setting id="kodi_password" type="string" label="32014" help="">
+        <level>0</level>
+        <default/>
+        <constraints>
+          <allowempty>true</allowempty>
+        </constraints>
+        <control type="edit" format="string">
+          <heading>32014</heading>
+          <hidden>true</hidden>
+        </control>
+      </setting>
+      <!--
+      <setting id="show_movies" type="bool"
+        label="32003" default="true" />
+
+      <setting id="show_recent_movies" type="bool"
+        label="32004" default="true" enable="eq(-1,true)" />
+
+      <setting id="show_tvshows" type="bool"
+        label="32005" default="true" />
+
+      <setting id="flatten_tvshows" type="enum" lvalues="20420|20421|20422"
+        label="32009" default="1" enable="eq(-1,true)" />
+
+      <setting id="show_recent_episodes" type="bool"
+        label="32006" default="true" enable="eq(-2,true)" />
+
+      <setting label="32012" type="slider" id="watched_threshold" default="0.97" range="0.9,0.1,1.0" option="float" />
+      -->
+    </category>
+  </section>
 </settings>

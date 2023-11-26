@@ -58,3 +58,15 @@ msgstr ""
 msgctxt "#32012"
 msgid "Watched status threshold"
 msgstr ""
+
+msgctxt "#32013"
+msgid "Kodi login"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Kodi password"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Kodi hostname or IP address (without protocol)"
+msgstr ""

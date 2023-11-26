@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.external.library"
-version="0.0.4"
-name="Kodi External Video Library"
-provider-name="Roman V.M.">
+  version="0.0.4"
+  name="Kodi External Video Library"
+  provider-name="Roman V.M.">
 <requires>
-  <import addon="xbmc.python" version="3.0.0"/>
+  <import addon="xbmc.python" version="3.0.1"/>
 </requires>
 <extension point="xbmc.python.pluginsource" library="main.py">
   <provides>video</provides>

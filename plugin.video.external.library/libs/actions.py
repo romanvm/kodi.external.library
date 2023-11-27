@@ -50,7 +50,7 @@ def root():
     if ADDON.getSettingBool('show_movies'):
         list_item = ListItem(f'[{_("Movies")}]')
         list_item.setArt({'icon': 'DefaultMovies.png', 'thumb': 'DefaultMovies.png'})
-        url = get_url(mediatype='movie')
+        url = get_url(content='movies')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
     # if ADDON.getSettingBool('show_tvshows'):
     #     list_item = ListItem(f'[{_("TV Shows")}]')
@@ -116,11 +116,11 @@ def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str
         info_tag.setResumePoint(time=resume.get('position', 0.0), totaltime=resume.get('total', 0.0))
 
 
-def show_movies():
+def show_movies(content):
     xbmcplugin.setPluginCategory(HANDLE, _('Movies'))
-    xbmcplugin.setContent(HANDLE, 'movies')
+    xbmcplugin.setContent(HANDLE, content)
     movies = medialibrary.get_movies()
-    logger.debug('Creating a list of movies...', trace=True)
+    logger.debug('Creating a list of movies...')
     for mov in movies:
         list_item = ListItem(mov.get('title') or mov.get('label'))
         if art := mov.get('art'):
@@ -129,6 +129,7 @@ def show_movies():
         _set_info(info_tag, mov, 'movie')
         url = f'{VIDEO_URL}/{quote(mov["file"])}'
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=False)
+    logger.debug('Finished creating a list of movies.')
 
 
 def router(paramstring):
@@ -136,6 +137,6 @@ def router(paramstring):
     logger.debug('Called addon with params: %s', str(sys.argv))
     if 'mediatype' not in params:
         root()
-    elif params['mediatype'] == 'movie' and not params.get('recent'):
-        show_movies()
+    elif params['content'] == 'movies' and not params.get('recent'):
+        show_movies(params['content'])
     xbmcplugin.endOfDirectory(HANDLE)

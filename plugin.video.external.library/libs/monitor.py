@@ -17,7 +17,7 @@ from urllib.parse import quote
 
 import xbmc
 
-from libs import medialibrary as ml
+from libs import medialibrary
 from libs.kodi_service import logger, ADDON
 from libs.mem_storage import MemStorage
 
@@ -77,7 +77,7 @@ class PlayMonitor(xbmc.Player):
                     content = 'episodes'
                     id_ = item['episodeid']
                 return content, id_
-        raise RuntimeError('Played item {0} is not in listing!'.format(self._playing_file))
+        raise RuntimeError(f'Played item {self._playing_file} is not in listing!')
 
     def _update_watched(self):
         self.is_monitoring = False
@@ -89,5 +89,5 @@ class PlayMonitor(xbmc.Player):
                 logger.error('Unable to update watched status')
             else:
                 logger.debug('Updating watched status for %s %s', content[:-1], self._playing_file)
-                ml.update_item_playcount(content, id_, 1)
+                medialibrary.update_item_playcount(content, id_, 1)
         self._playing_file = None

@@ -135,7 +135,7 @@ def show_movies(content):
 def router(paramstring):
     params = dict(parse_qsl(paramstring))
     logger.debug('Called addon with params: %s', str(sys.argv))
-    if 'mediatype' not in params:
+    if 'content' not in params:
         root()
     elif params['content'] == 'movies' and not params.get('recent'):
         show_movies(params['content'])

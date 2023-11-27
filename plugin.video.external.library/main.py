@@ -16,8 +16,8 @@
 import sys
 
 from libs.actions import router
-from libs.exception_logger import log_exception
+from libs.exception_logger import catch_exception
 from libs.kodi_service import logger
 
-with log_exception(logger.error):
+with catch_exception(logger.error):
     router(sys.argv[2][1:])

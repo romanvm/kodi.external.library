@@ -26,6 +26,8 @@ import xbmc
 from xbmcaddon import Addon
 from xbmcvfs import translatePath
 
+from libs.exception_logger import format_trace, format_exception
+
 ADDON = Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
@@ -41,36 +43,40 @@ class logger:  # pylint: disable=invalid-name
     FORMAT = '[{id} v.{version}] - {filename}:{lineno} - {message}'
 
     @classmethod
-    def _write_message(cls, message, *args, level=xbmc.LOGDEBUG):
+    def _write_message(cls, message, *args, trace=False, exc_info=False, level=xbmc.LOGDEBUG):
+        if trace and exc_info:
+            raise ValueError('"trace" and "exc_info" parameters cannot be used a the same time')
         if args:
             message = message % args
         curr_frame = inspect.currentframe()
-        xbmc.log(
-            cls.FORMAT.format(
-                id=ADDON_ID,
-                version=ADDON_VERSION,
-                filename=os.path.basename(curr_frame.f_back.f_back.f_code.co_filename),
-                lineno=curr_frame.f_back.f_back.f_lineno,
-                message=message
-            ),
-            level
+        formatted_message = cls.FORMAT.format(
+            id=ADDON_ID,
+            version=ADDON_VERSION,
+            filename=os.path.basename(curr_frame.f_back.f_back.f_code.co_filename),
+            lineno=curr_frame.f_back.f_back.f_lineno,
+            message=message
         )
+        if trace:
+            formatted_message += '\n' + format_trace(3)
+        if exc_info:
+            formatted_message += '\n' + format_exception()
+        xbmc.log(formatted_message, level)
 
     @classmethod
-    def info(cls, message, *args):
-        cls._write_message(message, *args, level=xbmc.LOGINFO)
+    def info(cls, message, *args, trace=False, exc_info=False):
+        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGINFO)
 
     @classmethod
-    def warning(cls, message, *args):
-        cls._write_message(message, *args, level=xbmc.LOGWARNING)
+    def warning(cls, message, *args, trace=False, exc_info=False):
+        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGWARNING)
 
     @classmethod
-    def error(cls, message, *args):
-        cls._write_message(message, *args, level=xbmc.LOGERROR)
+    def error(cls, message, *args, trace=False, exc_info=False):
+        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGERROR)
 
     @classmethod
-    def debug(cls, message, *args):
-        cls._write_message(message, *args, level=xbmc.LOGDEBUG)
+    def debug(cls, message, *args, trace=False, exc_info=False):
+        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGDEBUG)
 
 
 class GettextEmulator:
@@ -82,7 +88,7 @@ class GettextEmulator:
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super().__new__(*args, **kwargs)
+            cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):

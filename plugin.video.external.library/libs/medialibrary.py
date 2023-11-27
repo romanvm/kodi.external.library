@@ -1,7 +1,17 @@
-# coding: utf-8
-# Created on: 20.07.2016
-# Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
-# License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+# Copyright (C) 2023, Roman Miroshnychenko aka Roman V.M.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import namedtuple
 from pprint import pformat
@@ -31,7 +41,7 @@ def _send_json_rpc(method, params=None):
     request = {'jsonrpc': '2.0', 'method': method, 'id': '1'}
     if params is not None:
         request['params'] = params
-    logger.debug('JSON-RPC request: %s', request)
+    logger.debug('JSON-RPC request: %s', pformat(request))
     auth = None
     login = ADDON.getSetting('kodi_login')
     password = ADDON.getSetting('kodi_password')
@@ -75,8 +85,15 @@ def get_movies(recent=False):
         sort = {'order': 'ascending', 'method': 'label'}
     params = {
         'properties': [
-            'file', 'playcount', 'resume', 'plot',
-            'director', 'genre', 'cast', 'art', 'year', 'studio'
+            'file',
+            'playcount',
+            'resume',
+            'plot',
+            'director',
+            'genre',
+            'cast',
+            'year',
+            'studio',
         ],
         'sort': sort
     }
@@ -94,7 +111,7 @@ def get_tvshows():
     """
     method = 'VideoLibrary.GetTVShows'
     params = {
-        'properties': ['plot', 'genre', 'cast', 'art', 'year', 'studio'],
+        'properties': ['plot', 'genre', 'cast', 'year', 'studio'],
         'sort': {'order': 'ascending', 'method': 'label'},
     }
     result = _get_info(method, params)
@@ -113,7 +130,7 @@ def get_seasons(tvshowid):
     method = 'VideoLibrary.GetSeasons'
     params = {
         'tvshowid': tvshowid,
-        'properties': ['showtitle', 'season', 'tvshowid', 'art'],
+        'properties': ['showtitle', 'season', 'tvshowid'],
         'sort': {'order': 'ascending', 'method': 'season'},
     }
     result = _get_info(method, params)
@@ -134,7 +151,7 @@ def get_episodes(tvshowid=-1, season=-1, recent=False):
     params = {
         'properties': [
             'showtitle', 'season', 'episode', 'title', 'tvshowid',
-            'cast', 'firstaired', 'director', 'plot', 'file', 'playcount', 'resume', 'art'
+            'cast', 'firstaired', 'director', 'plot', 'file', 'playcount', 'resume'
         ],
     }
     if recent:

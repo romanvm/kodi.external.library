@@ -1,6 +1,17 @@
-# coding: utf-8
-# Created on: 25.11.2016
-# Author: Roman Miroshnychenko aka Roman V.M. (romanvm@yandex.ua)
+# Copyright (C) 2023, Roman Miroshnychenko aka Roman V.M.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import base64
 import pickle
@@ -10,9 +21,9 @@ import xbmcgui
 
 class MemStorage:
     """
-    Stores a picklable Python object as a Kodi window property
+    Stores a picklable Python object in a shared memory within Kodi
 
-    This class can be used as an inter-process in-memory storage
+    It can be used to exchange data between different Python scripts running inside Kodi.
     """
     def __init__(self, window_id=10000):
         self._window = xbmcgui.Window(window_id)
@@ -27,3 +38,12 @@ class MemStorage:
     def __setitem__(self, key, value):
         pickled_value = pickle.dumps(value)
         self._window.setProperty(key, base64.b64encode(pickled_value).decode('ascii'))
+
+    def __delitem__(self, key):
+        self._window.clearProperty(key)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default

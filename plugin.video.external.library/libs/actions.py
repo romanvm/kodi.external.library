@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, NamedTuple, Type, Callable
 from urllib.parse import quote, urljoin, parse_qsl, urlencode
 
 import xbmcplugin
@@ -38,8 +38,36 @@ IMAGE_URL = urljoin(KODI_URL, 'image')
 VIDEO_URL = urljoin(KODI_URL, 'vfs')
 
 
-def get_url(**kwargs):
+class ContentTypeInfo(NamedTuple):
+    content: str
+    mediatype: str
+    plugin_category: str
+    handler_class: Type[medialibrary.BaseMediaItemsRetriever]
+    get_url_func: Callable[[Dict[str, Any]], str]
+
+
+def _get_plugin_url(**kwargs):
     return f'{PLUGIN_URL}?{urlencode(kwargs)}'
+
+
+def get_videofile_url(media_info):
+    return f'{VIDEO_URL}/{quote(media_info["file"])}'
+
+
+def get_seasons_url(media_info):
+    return _get_plugin_url(content_type='seasons', tvshowid=str(media_info['tvshowid']))
+
+
+def get_episodes_url(media_info):
+    return _get_plugin_url(content_type='episodes', tvshowid=str(media_info['tvshowid']))
+
+
+CONTENT_TYPE_MAP = {
+    'movies': ContentTypeInfo('movies', 'movie',
+                              _('Movies'), medialibrary.Movies, get_videofile_url),
+    'recent_movies': ContentTypeInfo('movies', 'movie',
+                                     _('Recent Movies'), medialibrary.RecentMovies, get_videofile_url),
+}
 
 
 def root():
@@ -50,7 +78,7 @@ def root():
     if ADDON.getSettingBool('show_movies'):
         list_item = ListItem(f'[{_("Movies")}]')
         list_item.setArt({'icon': 'DefaultMovies.png', 'thumb': 'DefaultMovies.png'})
-        url = get_url(content='movies')
+        url = _get_plugin_url(content_type='movies')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
     # if ADDON.getSettingBool('show_tvshows'):
     #     list_item = ListItem(f'[{_("TV Shows")}]')
@@ -116,27 +144,41 @@ def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str
         info_tag.setResumePoint(time=resume.get('position', 0.0), totaltime=resume.get('total', 0.0))
 
 
-def show_movies(content):
-    xbmcplugin.setPluginCategory(HANDLE, _('Movies'))
-    xbmcplugin.setContent(HANDLE, content)
-    movies = medialibrary.get_movies()
-    logger.debug('Creating a list of movies...')
-    for mov in movies:
-        list_item = ListItem(mov.get('title') or mov.get('label'))
-        if art := mov.get('art'):
+def show_media_items(content_type, tvshowid=None, season=None):
+    content_type_info = CONTENT_TYPE_MAP.get(content_type)
+    if content_type_info is None:
+        logger.error('Unknown content type: %s', content_type)
+        return
+    xbmcplugin.setPluginCategory(HANDLE, content_type_info.plugin_category)
+    xbmcplugin.setContent(HANDLE, content_type_info.content)
+    handler_class = content_type_info.handler_class
+    handler_class.content = content_type_info.content
+    handler_class.tvshowid = tvshowid
+    handler_class.season = season
+    media_items = content_type_info.handler_class().get_media_items()
+    logger.debug('Creating a list of %s items...', content_type)
+    for media_info in media_items:
+        list_item = ListItem(media_info.get('title') or media_info.get('label'))
+        if art := media_info.get('art'):
             _set_art(list_item, art)
         info_tag = list_item.getVideoInfoTag()
-        _set_info(info_tag, mov, 'movie')
-        url = f'{VIDEO_URL}/{quote(mov["file"])}'
+        _set_info(info_tag, media_info, content_type_info.mediatype)
+        url = content_type_info.get_url_func(media_info)
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=False)
-    logger.debug('Finished creating a list of movies.')
+    logger.debug('Finished creating a of %s items.', content_type)
 
 
 def router(paramstring):
     params = dict(parse_qsl(paramstring))
     logger.debug('Called addon with params: %s', str(sys.argv))
-    if 'content' not in params:
+    if 'content_type' not in params:
         root()
-    elif params['content'] == 'movies' and not params.get('recent'):
-        show_movies(params['content'])
+    else:
+        tvshowid = params.get('tvshowid')
+        if tvshowid is not None:
+            tvshowid = int(tvshowid)
+        season = params.get('season')
+        if season is not None:
+            season = int(season)
+        show_media_items(params['content_type'], tvshowid, season)
     xbmcplugin.endOfDirectory(HANDLE)

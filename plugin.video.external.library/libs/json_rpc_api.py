@@ -181,3 +181,21 @@ class SetMovieDetails(BaseJsonRpcApi):
 
 class SetEpisodeDetails(SetMovieDetails):
     method = 'VideoLibrary.SetEpisodeDetails'
+
+
+SET_DETAILS_API_MAP = {
+    'movieid': SetMovieDetails,
+    'episodeid': SetEpisodeDetails,
+}
+
+
+def update_playcount(item_id_param, item_id, playcount):
+    api_class = SET_DETAILS_API_MAP[item_id_param]
+    api = api_class()
+    api.set_details(**{item_id_param: item_id, 'playcount': playcount})
+
+
+def update_resume(item_id_param, item_id, position, total):
+    api_class = SET_DETAILS_API_MAP[item_id_param]
+    api = api_class()
+    api.set_details(**{item_id_param: item_id, 'resume': {'position': position, 'total': total}})

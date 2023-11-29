@@ -17,7 +17,7 @@ from typing import Type, List, Dict, Any, Optional, Tuple
 from urllib.parse import urljoin, quote
 
 from libs import json_rpc_api
-from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID
+from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID, ADDON
 
 _ = GettextEmulator.gettext
 
@@ -67,6 +67,11 @@ class PlayableContentMixin:
         command = f'RunScript({ADDON_ID},update_playcount,{item_id_param},{item_id},{playcount_to_set})'
         return [(caption, command)]
 
+    def get_item_url(self, media_info: Dict[str, Any]) -> str:
+        if ADDON.getSettingBool('files_on_shares'):
+            return media_info['file']
+        return f'{VIDEO_URL}/{quote(media_info["file"])}'
+
 
 class MoviesHandler(PlayableContentMixin, BaseContentTypeHandler):
     content = 'movies'
@@ -77,9 +82,6 @@ class MoviesHandler(PlayableContentMixin, BaseContentTypeHandler):
 
     def get_plugin_category(self) -> str:
         return _('Movies')
-
-    def get_item_url(self, media_info):
-        return f'{VIDEO_URL}/{quote(media_info["file"])}'
 
 
 class RecentMoviesHandler(MoviesHandler):

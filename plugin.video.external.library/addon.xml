@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.external.library"
     version="0.0.4"
-    name="Kodi External Video Library"
+    name="External Kodi Videolibrary Client"
     provider-name="Roman V.M.">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>

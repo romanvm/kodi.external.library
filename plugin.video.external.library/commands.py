@@ -29,8 +29,7 @@ def main():
     if len(sys.argv) == 1:
         xbmcgui.Dialog().ok(_('External Kodi Videolibrary Client'),
                             _(r'Please run this addon from \"Video addons\" section.'))
-        sys.exit(0)
-    if sys.argv[1] == 'update_playcount':
+    elif sys.argv[1] == 'update_playcount':
         update_playcount(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
         xbmc.executebuiltin('Container.Refresh')
 

@@ -149,10 +149,11 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
             _set_art(list_item, art)
         info_tag = list_item.getVideoInfoTag()
         _set_info(info_tag, media_info, content_type_handler.mediatype)
+        list_item.addContextMenuItems(content_type_handler.get_item_context_menu(media_info))
         url = content_type_handler.get_item_url(media_info)
         directory_items.append((url, list_item, content_type_handler.item_is_folder))
         if content_type_handler.should_save_to_mem_storage:
-            content_id_key = f'{content_type_handler.content}id'
+            content_id_key = f'{content_type_handler.mediatype}id'
             mem_storage_items.append({
                 'mediatype': content_type_handler.mediatype,
                 content_id_key: media_info[content_id_key],

@@ -49,7 +49,7 @@ class BaseContentTypeHandler:
     def get_item_url(self, media_info: Dict[str, Any]) -> str:
         raise NotImplementedError
 
-    def get_item_context_menu(self) -> List[Tuple[str, str]]:
+    def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
         raise NotImplementedError
 
 
@@ -65,6 +65,9 @@ class MoviesHandler(BaseContentTypeHandler):
 
     def get_item_url(self, media_info):
         return f'{VIDEO_URL}/{quote(media_info["file"])}'
+
+    def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
+        return []
 
 
 class RecentMoviesHandler(MoviesHandler):

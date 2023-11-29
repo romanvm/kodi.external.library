@@ -14,15 +14,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from typing import Dict, Any, NamedTuple, Type, Callable
-from urllib.parse import quote, urljoin, parse_qsl, urlencode
+from typing import Dict, Any
+from urllib.parse import quote, urljoin, parse_qsl
 
 import xbmcplugin
 from xbmc import InfoTagVideo, Actor
 from xbmcgui import Dialog, ListItem
 
-from libs import medialibrary
-from libs.kodi_service import ADDON, ADDON_ID, GettextEmulator, logger, get_kodi_url
+from libs.content_type_handlers import MoviesHandler, RecentMoviesHandler
+from libs.exceptions import NoDataError, RemoteKodiError
+from libs.kodi_service import (ADDON, ADDON_ID, GettextEmulator,
+                               logger, get_remote_kodi_url, get_plugin_url)
 from libs.mem_storage import MemStorage
 
 _ = GettextEmulator.gettext
@@ -31,42 +33,15 @@ PLUGIN_URL = f'plugin://{ADDON_ID}/'
 HANDLE = int(sys.argv[1])
 
 DIALOG = Dialog()
-STORAGE = MemStorage()
 
-KODI_URL = get_kodi_url(with_credentials=True)
-IMAGE_URL = urljoin(KODI_URL, 'image')
-VIDEO_URL = urljoin(KODI_URL, 'vfs')
-
-
-class ContentTypeInfo(NamedTuple):
-    content: str
-    mediatype: str
-    plugin_category: str
-    handler_class: Type[medialibrary.BaseMediaItemsRetriever]
-    get_url_func: Callable[[Dict[str, Any]], str]
+REMOTE_KODI_URL = get_remote_kodi_url(with_credentials=True)
+IMAGE_URL = urljoin(REMOTE_KODI_URL, 'image')
+VIDEO_URL = urljoin(REMOTE_KODI_URL, 'vfs')
 
 
-def _get_plugin_url(**kwargs):
-    return f'{PLUGIN_URL}?{urlencode(kwargs)}'
-
-
-def get_videofile_url(media_info):
-    return f'{VIDEO_URL}/{quote(media_info["file"])}'
-
-
-def get_seasons_url(media_info):
-    return _get_plugin_url(content_type='seasons', tvshowid=str(media_info['tvshowid']))
-
-
-def get_episodes_url(media_info):
-    return _get_plugin_url(content_type='episodes', tvshowid=str(media_info['tvshowid']))
-
-
-CONTENT_TYPE_MAP = {
-    'movies': ContentTypeInfo('movies', 'movie',
-                              _('Movies'), medialibrary.Movies, get_videofile_url),
-    'recent_movies': ContentTypeInfo('movies', 'movie',
-                                     _('Recent Movies'), medialibrary.RecentMovies, get_videofile_url),
+CONTENT_TYPE_HANDLERS = {
+    'movies': MoviesHandler,
+    'recent_movies': RecentMoviesHandler,
 }
 
 
@@ -78,13 +53,14 @@ def root():
     if ADDON.getSettingBool('show_movies'):
         list_item = ListItem(f'[{_("Movies")}]')
         list_item.setArt({'icon': 'DefaultMovies.png', 'thumb': 'DefaultMovies.png'})
-        url = _get_plugin_url(content_type='movies')
+        url = get_plugin_url(content_type='movies')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
-    # if ADDON.getSettingBool('show_tvshows'):
-    #     list_item = ListItem(f'[{_("TV Shows")}]')
-    #     list_item.setArt({'icon': 'DefaultTVShows.png', 'thumb': 'DefaultTVShows.png'})
-    #     url = get_url(content='tvshows')
-    #     xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+        if ADDON.getSettingBool('show_recent_movies'):
+            list_item = ListItem(f'[{_("Recently added movies")}]')
+            list_item.setArt({'icon': 'DefaultRecentlyAddedMovies.png',
+                              'thumb': 'DefaultRecentlyAddedMovies.png'})
+            url = get_plugin_url(content_type='recent_movies')
+            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
 
 
 def _set_art(list_item: ListItem, raw_art: Dict[str, str]) -> None:
@@ -144,28 +120,46 @@ def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str
         info_tag.setResumePoint(time=resume.get('position', 0.0), totaltime=resume.get('total', 0.0))
 
 
-def show_media_items(content_type, tvshowid=None, season=None):
-    content_type_info = CONTENT_TYPE_MAP.get(content_type)
-    if content_type_info is None:
-        logger.error('Unknown content type: %s', content_type)
+def show_media_items(content_type, tvshowid=None, season=None, parent_category=None):
+    content_type_handler_class = CONTENT_TYPE_HANDLERS.get(content_type)
+    if content_type_handler_class is None:
+        raise RuntimeError(f'Unknown content type: {content_type}')
+    content_type_handler = content_type_handler_class(tvshowid, season, parent_category)
+    xbmcplugin.setPluginCategory(HANDLE, content_type_handler.get_plugin_category())
+    xbmcplugin.setContent(HANDLE, content_type_handler.content)
+    try:
+        media_items = content_type_handler.get_media_items()
+    except NoDataError:
+        logger.exception('Unable to retrieve %s from the remote Kodi library',
+                         content_type)
+        DIALOG.notification(ADDON_ID, _('Unable to retrieve data from the remote Kodi library!'),
+                            icon='error')
         return
-    xbmcplugin.setPluginCategory(HANDLE, content_type_info.plugin_category)
-    xbmcplugin.setContent(HANDLE, content_type_info.content)
-    handler_class = content_type_info.handler_class
-    handler_class.content = content_type_info.content
-    handler_class.tvshowid = tvshowid
-    handler_class.season = season
-    media_items = content_type_info.handler_class().get_media_items()
+    except RemoteKodiError as exc:
+        logger.exception('Unable to connect to %s', str(exc))
+        DIALOG.notification(ADDON_ID, _('Unable to connect to the remote Kodi host!'), icon='error')
+        return
     logger.debug('Creating a list of %s items...', content_type)
+    directory_items = []
+    mem_storage_items = []
     for media_info in media_items:
-        list_item = ListItem(media_info.get('title') or media_info.get('label'))
+        list_item = ListItem(media_info.get('title') or media_info.get('label', ''))
         if art := media_info.get('art'):
             _set_art(list_item, art)
         info_tag = list_item.getVideoInfoTag()
-        _set_info(info_tag, media_info, content_type_info.mediatype)
-        url = content_type_info.get_url_func(media_info)
-        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=False)
-    logger.debug('Finished creating a of %s items.', content_type)
+        _set_info(info_tag, media_info, content_type_handler.mediatype)
+        url = content_type_handler.get_item_url(media_info)
+        directory_items.append((url, list_item, content_type_handler.item_is_folder))
+        if content_type_handler.should_save_to_mem_storage:
+            mem_storage_items.append({
+                'mediatype': content_type_handler.mediatype,
+                f'{content_type_handler.content}id': media_info[f'{content_type_handler.mediatype}id'],
+                'file': media_info['file'],
+            })
+    xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))
+    mem_storage = MemStorage()
+    mem_storage['__external_library_list__'] = mem_storage_items
+    logger.debug('Finished creating a list of %s items.', content_type)
 
 
 def router(paramstring):
@@ -174,11 +168,10 @@ def router(paramstring):
     if 'content_type' not in params:
         root()
     else:
-        tvshowid = params.get('tvshowid')
-        if tvshowid is not None:
+        if (tvshowid := params.get('tvshowid')) is not None:
             tvshowid = int(tvshowid)
-        season = params.get('season')
-        if season is not None:
+        if (season := params.get('season')) is not None:
             season = int(season)
-        show_media_items(params['content_type'], tvshowid, season)
+        parent_category = params.get('parent_category')
+        show_media_items(params['content_type'], tvshowid, season, parent_category)
     xbmcplugin.endOfDirectory(HANDLE)

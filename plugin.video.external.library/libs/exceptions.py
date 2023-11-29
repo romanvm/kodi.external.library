@@ -1,4 +1,4 @@
-# Copyright (C) 2023, Roman Miroshnychenko aka Roman V.M.
+# (c) Roman Miroshnychenko <roman1972@gmail.com> 2020
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 
-import xbmc
+class NoDataError(Exception):
+    pass
 
-from libs import medialibrary_api as ml
 
-if __name__ == '__main__':
-    if sys.argv[1] == 'update_playcount':
-        ml.update_item_playcount(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
-        xbmc.executebuiltin('Container.Refresh')
+class RemoteKodiError(ConnectionError):
+    pass

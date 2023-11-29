@@ -17,7 +17,7 @@ from urllib.parse import quote
 
 import xbmc
 
-from libs import medialibrary
+from libs import medialibrary_api
 from libs.kodi_service import logger, ADDON
 from libs.mem_storage import MemStorage
 
@@ -37,7 +37,7 @@ class PlayMonitor(xbmc.Player):
         self._listing = None
 
     def onPlayBackStarted(self):
-        if ml.KODI_URL in self.getPlayingFile():
+        if ml.REMOTE_KODI_URL in self.getPlayingFile():
             self._playing_file = self.getPlayingFile()
             self.is_monitoring = True
             self._listing = self._storage['__external_library_list__']

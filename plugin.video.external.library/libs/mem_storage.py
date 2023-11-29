@@ -13,15 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import base64
-import pickle
+import json
 
 import xbmcgui
 
 
 class MemStorage:
     """
-    Stores a picklable Python object in a shared memory within Kodi
+    Stores a JSON-serializable Python object in a shared memory within Kodi
 
     It can be used to exchange data between different Python scripts running inside Kodi.
     """
@@ -30,17 +29,17 @@ class MemStorage:
 
     def __getitem__(self, key):
         try:
-            b64_value = self._window.getProperty(key)
-            return pickle.loads(base64.b64decode(b64_value))
-        except (EOFError, KeyError, ValueError, pickle.PickleError) as exc:
-            raise KeyError(f'Item "{key}" not found or invalid item!') from exc
+            json_string = self._window.getProperty(key)
+            return json.loads(json_string)
+        except ValueError as exc:
+            raise KeyError(f'Item "{key}" cannot be retrieved from MemStorage') from exc
 
     def __setitem__(self, key, value):
-        pickled_value = pickle.dumps(value)
-        self._window.setProperty(key, base64.b64encode(pickled_value).decode('ascii'))
-
-    def __delitem__(self, key):
-        self._window.clearProperty(key)
+        try:
+            json_string = json.dumps(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'Item {key}:{value} cannot be stored in MemStorage') from exc
+        self._window.setProperty(key, json_string)
 
     def get(self, key, default=None):
         try:

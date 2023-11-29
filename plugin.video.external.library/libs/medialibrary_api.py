@@ -17,16 +17,13 @@ from pprint import pformat
 from typing import List, Dict, Any
 
 from libs import simple_requests as requests
-from libs.kodi_service import ADDON, logger, get_kodi_url
-
-
-class NoDataError(Exception):
-    pass
+from libs.exceptions import NoDataError, RemoteKodiError
+from libs.kodi_service import ADDON, logger, get_remote_kodi_url
 
 
 class BaseJsonRpcApi:
-    kodi_url = get_kodi_url()
-    method = None
+    kodi_url = get_remote_kodi_url(with_credentials=False)
+    method: str
 
     def send_json_rpc(self):
         """
@@ -45,46 +42,52 @@ class BaseJsonRpcApi:
         if login:
             auth = (login, password)
         try:
-            json_reply = requests.post(self.kodi_url + '/jsonrpc', json=request, auth=auth).json()
+            json_reply = requests.post(self.kodi_url + '/jsonrpc', json=request,
+                                       auth=auth, verify=False).json()
         except requests.RequestException as exc:
-            raise ConnectionError from exc
+            raise RemoteKodiError(self.kodi_url) from exc
         logger.debug('JSON-RPC reply: %s', pformat(json_reply))
         return json_reply
 
-    def get_params(self):
+    def get_params(self) -> Dict[str, Any]:
         """Get params to send to Kodi JSON-RPC API"""
         raise NotImplementedError
 
 
 class BaseMediaItemsRetriever(BaseJsonRpcApi):
-    content = None
-    properties = None
-    sort = None
-    tvshowid = None
-    season = None
+    properties: List[str]
+    sort = Dict[str, str]
 
-    def get_params(self):
+    def __init__(self, content, tvshowid=None, season=None):
+        self._content = content
+        self._tvshowid = tvshowid
+        self._season = season
+
+    def get_params(self) -> Dict[str, Any]:
         params = {
             'properties': self.properties,
             'sort': self.sort,
         }
-        if self.tvshowid is not None:
-            params['tvshowid'] = self.tvshowid
-        if self.season is not None:
-            params['season'] = self.season
+        if self._tvshowid is not None:
+            params['tvshowid'] = self._tvshowid
+        if self._season is not None:
+            params['season'] = self._season
         return params
 
     def get_media_items(self) -> List[Dict[str, Any]]:
         """
         Get the list of media items for Kodi database
+        
+        :raises: NoDataError when media items are not retrieved via JSON-RPC
         """
         try:
-            return self.send_json_rpc()['result'][self.content]
+            return self.send_json_rpc()['result'][self._content]
         except KeyError as exc:
-            raise NoDataError(f'Unable to retrieve {self.content} from remote media library') from exc
+            raise NoDataError(
+                f'Unable to retrieve {self._content} from remote media library') from exc
 
 
-class Movies(BaseMediaItemsRetriever):
+class GetMovies(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetMovies'
     properties = [
         'file',
@@ -107,12 +110,12 @@ class Movies(BaseMediaItemsRetriever):
     sort = {'order': 'ascending', 'method': 'label'}
 
 
-class RecentMovies(Movies):
+class GetRecentlyAddedMovies(GetMovies):
     method = 'VideoLibrary.GetRecentlyAddedMovies'
     sort = {'order': 'descending', 'method': 'dateadded'}
 
 
-class TvShows(BaseMediaItemsRetriever):
+class GetTVShows(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetTVShows'
     properties = [
         'plot',
@@ -125,7 +128,7 @@ class TvShows(BaseMediaItemsRetriever):
     sort = {'order': 'ascending', 'method': 'label'}
 
 
-class Seasons(BaseMediaItemsRetriever):
+class GetSeasons(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetSeasons'
     properties = [
         'showtitle',
@@ -136,7 +139,7 @@ class Seasons(BaseMediaItemsRetriever):
     sort = {'order': 'ascending', 'method': 'season'}
 
 
-class Episodes(BaseMediaItemsRetriever):
+class GetEpisodes(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetEpisodes'
     properties = [
         'showtitle',
@@ -156,16 +159,9 @@ class Episodes(BaseMediaItemsRetriever):
     sort = {'order': 'ascending', 'method': 'label'}
 
 
-class RecentEpisodes(Episodes):
+class GetRecentlyAddedEpisodes(GetEpisodes):
     method = 'VideoLibrary.GetRecentlyAddedEpisodes'
     sort = {'order': 'descending', 'method': 'dateadded'}
-
-
-class BasePlaycountUpdater(BaseJsonRpcApi):
-
-   def __init__(self):
-       super().__init__()
-       self.playcount = None
 
 
 def update_item_playcount(content, id_, playcount):

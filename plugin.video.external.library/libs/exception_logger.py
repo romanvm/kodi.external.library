@@ -186,7 +186,7 @@ def catch_exception(logger_func: Callable[[str], None] = _log_error) -> Generato
     try:
         yield
     except Exception as exc:
-        logger_func('\n*********************************** Unhandled exception detected ***********************************')
         message = format_exception(exc)
-        logger_func(message)
+        logger_func('*********************************** Unhandled exception detected ***********************************\n'
+                    + message)
         raise

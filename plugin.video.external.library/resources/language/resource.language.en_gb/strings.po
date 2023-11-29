@@ -40,7 +40,7 @@ msgid "Unable to connect to the remote Kodi host!"
 msgstr ""
 
 msgctxt "#32008"
-msgid "Remote Kodi library contains no relevant data!"
+msgid "Unable to retrieve data from the remote Kodi library!"
 msgstr ""
 
 msgctxt "#32009"

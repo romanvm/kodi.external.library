@@ -1,4 +1,3 @@
-# coding: utf-8
 # (c) Roman Miroshnychenko <roman1972@gmail.com> 2020
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,10 +16,11 @@
 """Classes and functions to interact with Kodi API"""
 import hashlib
 import inspect
+import json
 import os
-import pickle
 import re
 from pathlib import Path
+from urllib.parse import urlencode
 
 import xbmc
 from xbmcaddon import Addon
@@ -36,6 +36,8 @@ ADDON_VERSION = ADDON.getAddonInfo('version')
 ADDON_DIR = Path(translatePath(ADDON.getAddonInfo('path')))
 ADDON_ICON = Path(translatePath(ADDON.getAddonInfo('icon')))
 ADDON_PROFILE_DIR = Path(translatePath(ADDON.getAddonInfo('profile')))
+
+PLUGIN_URL = f'plugin://{ADDON_ID}/'
 
 
 class logger:  # pylint: disable=invalid-name
@@ -75,6 +77,10 @@ class logger:  # pylint: disable=invalid-name
         cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGERROR)
 
     @classmethod
+    def exception(cls, message, *args):
+        cls.error(message, *args, exc_info=True)
+
+    @classmethod
     def debug(cls, message, *args, trace=False, exc_info=False):
         cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGDEBUG)
 
@@ -97,7 +103,7 @@ class GettextEmulator:
             raise self.LocalizationError('Missing resource.language.en_gb strings.po localization file')
         if not ADDON_PROFILE_DIR.exists():
             ADDON_PROFILE_DIR.mkdir()
-        self._string_mapping_path = ADDON_PROFILE_DIR / 'strings-map.pickle'
+        self._string_mapping_path = ADDON_PROFILE_DIR / 'strings-map.json'
         self.strings_mapping = self._load_strings_mapping()
 
     def _load_strings_po(self):  # pylint: disable=missing-docstring
@@ -116,18 +122,18 @@ class GettextEmulator:
         strings_po = self._load_strings_po()
         strings_po_md5 = hashlib.md5(strings_po.encode('utf-8')).hexdigest()
         try:
-            with self._string_mapping_path.open('rb') as fo:
-                mapping = pickle.load(fo)
+            with self._string_mapping_path.open('r', encoding='utf-8') as fo:
+                mapping = json.load(fo)
             if mapping['md5'] != strings_po_md5:
                 raise IOError('resource.language.en_gb strings.po has been updated')
-        except (IOError, pickle.PickleError):
+        except (IOError, ValueError):
             strings_mapping = self._parse_strings_po(strings_po)
             mapping = {
                 'strings': strings_mapping,
                 'md5': strings_po_md5,
             }
-            with self._string_mapping_path.open('wb') as fo:
-                pickle.dump(mapping, fo)
+            with self._string_mapping_path.open('w', encoding='utf-8') as fo:
+                json.dump(mapping, fo)
         return mapping['strings']
 
     @staticmethod
@@ -143,7 +149,7 @@ class GettextEmulator:
         return {string: int(string_id) for string_id, string in id_string_pairs if string}
 
     @classmethod
-    def gettext(cls, en_string):
+    def gettext(cls, en_string: str) -> str:
         """
         Return a localized UI string by a resource.language.en_gb source string
 
@@ -153,13 +159,17 @@ class GettextEmulator:
         emulator = cls()
         try:
             string_id = emulator.strings_mapping[en_string]
-        except KeyError:
+        except KeyError as exc:
             raise cls.LocalizationError(
-                f'Unable to find resource.language.en_gb string "{en_string}" in strings.po')
+                f'Unable to find "{en_string}" string in resource.language.en_gb/strings.po') from exc
         return ADDON.getLocalizedString(string_id)
 
 
-def get_kodi_url(with_credentials=False):
+def get_plugin_url(**kwargs):
+    return f'{PLUGIN_URL}?{urlencode(kwargs)}'
+
+
+def get_remote_kodi_url(with_credentials=False):
     host = ADDON.getSetting('kodi_host')
     port = ADDON.getSetting('kodi_port')
     login = ADDON.getSetting('kodi_login')

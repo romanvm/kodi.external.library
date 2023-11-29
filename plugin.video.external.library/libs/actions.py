@@ -117,7 +117,8 @@ def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str
     if premiered := media_info.get('premiered'):
         info_tag.setPremiered(premiered)
     if resume := media_info.get('resume'):
-        info_tag.setResumePoint(time=resume.get('position', 0.0), totaltime=resume.get('total', 0.0))
+        info_tag.setResumePoint(time=resume.get('position', 0.0),
+                                totaltime=resume.get('total', 0.0))
 
 
 def show_media_items(content_type, tvshowid=None, season=None, parent_category=None):
@@ -151,9 +152,10 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
         url = content_type_handler.get_item_url(media_info)
         directory_items.append((url, list_item, content_type_handler.item_is_folder))
         if content_type_handler.should_save_to_mem_storage:
+            content_id_key = f'{content_type_handler.content}id'
             mem_storage_items.append({
                 'mediatype': content_type_handler.mediatype,
-                f'{content_type_handler.content}id': media_info[f'{content_type_handler.mediatype}id'],
+                content_id_key: media_info[content_id_key],
                 'file': media_info['file'],
             })
     xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))

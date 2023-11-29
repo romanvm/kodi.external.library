@@ -8,7 +8,7 @@ msgstr ""
 
 
 msgctxt "#32000"
-msgid "General"
+msgid "Access"
 msgstr ""
 
 msgctxt "#32001"
@@ -76,9 +76,25 @@ msgid "Kodi Medialibrary on {kodi_host}"
 msgstr ""
 
 msgctxt "#32017"
-msgid "External Kodi Medialibrary Client"
+msgid "Kodi External Video Library Client"
 msgstr ""
 
 msgctxt "#32018"
 msgid "Please run this addon from \"Video addons\" section."
+msgstr ""
+
+msgctxt "#32019"
+msgid "Mediafiles on network shares"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Enable if your mediafiles are stored on network shares accessible from this device."
+msgstr ""
+
+msgctxt "#32021"
+msgid "Videolibrary Sections"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Playback"
 msgstr ""

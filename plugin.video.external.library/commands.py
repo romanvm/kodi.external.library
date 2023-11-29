@@ -16,10 +16,37 @@
 import sys
 
 import xbmc
+import xbmcgui
 
-from libs import medialibrary_api as ml
+from libs.exception_logger import catch_exception
+from libs.json_rpc_api import SetMovieDetails, SetEpisodeDetails
+from libs.kodi_service import GettextEmulator, logger
+
+_ = GettextEmulator.gettext
+
+
+API_MAP = {
+    'movieid': SetMovieDetails,
+    'episodeid': SetEpisodeDetails,
+}
+
+
+def update_playcount(item_id_param, item_id, playcount):
+    api_class = API_MAP[item_id_param]
+    api = api_class()
+    api.set_details(**{item_id_param: item_id, 'playcount': playcount})
+    xbmc.executebuiltin('Container.Refresh')
+
+
+def main():
+    if len(sys.argv) == 1:
+        xbmcgui.Dialog().ok(_('External Kodi Medialibrary Client'),
+                            _(r'Please run this addon from \"Video addons\" section.'))
+        sys.exit(0)
+    if sys.argv[1] == 'update_playcount':
+        update_playcount(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
+
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'update_playcount':
-        ml.update_item_playcount(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
-        xbmc.executebuiltin('Container.Refresh')
+    with catch_exception(logger.error):
+        main()

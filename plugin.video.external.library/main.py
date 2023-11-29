@@ -19,5 +19,6 @@ from libs.actions import router
 from libs.exception_logger import catch_exception
 from libs.kodi_service import logger
 
-with catch_exception(logger.error):
-    router(sys.argv[2][1:])
+if __name__ == '__main__':
+    with catch_exception(logger.error):
+        router(sys.argv[2][1:])

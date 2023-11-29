@@ -164,15 +164,20 @@ class GetRecentlyAddedEpisodes(GetEpisodes):
     sort = {'order': 'descending', 'method': 'dateadded'}
 
 
-def update_item_playcount(content, id_, playcount):
-    """
-    Update item's playcount
-    """
-    return
-    if content.endswith('movies'):
-        method = 'VideoLibrary.SetMovieDetails'
-        params = {'movieid': id_, 'playcount': playcount}
-    else:
-        method = 'VideoLibrary.SetEpisodeDetails'
-        params = {'episodeid': id_, 'playcount': playcount}
-    _send_json_rpc(method, params)
+class SetMovieDetails(BaseJsonRpcApi):
+    method = 'VideoLibrary.SetMovieDetails'
+
+    def __init__(self):
+        super().__init__()
+        self._params = None
+
+    def get_params(self) -> Dict[str, Any]:
+        return self._params
+
+    def set_details(self, **kwargs):
+        self._params = kwargs
+        self.send_json_rpc()
+
+
+class SetEpisodeDetails(SetMovieDetails):
+    method = 'VideoLibrary.SetEpisodeDetails'

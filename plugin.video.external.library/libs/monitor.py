@@ -17,7 +17,7 @@ from urllib.parse import quote
 
 import xbmc
 
-from libs import medialibrary_api
+from libs import json_rpc_api
 from libs.kodi_service import logger, ADDON
 from libs.mem_storage import MemStorage
 

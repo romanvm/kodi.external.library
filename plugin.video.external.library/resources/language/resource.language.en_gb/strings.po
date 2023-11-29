@@ -74,3 +74,11 @@ msgstr ""
 msgctxt "#32016"
 msgid "Kodi Medialibrary on {kodi_host}"
 msgstr ""
+
+msgctxt "#32017"
+msgid "External Kodi Medialibrary Client"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Please run this addon from \"Video addons\" section."
+msgstr ""

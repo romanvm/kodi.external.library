@@ -16,8 +16,8 @@
 from typing import Type, List, Dict, Any, Optional, Tuple
 from urllib.parse import urljoin, quote
 
-from libs import medialibrary_api
-from libs.kodi_service import GettextEmulator, get_remote_kodi_url
+from libs import json_rpc_api
+from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID
 
 _ = GettextEmulator.gettext
 
@@ -30,7 +30,7 @@ class BaseContentTypeHandler:
     mediatype: str
     item_is_folder: bool
     should_save_to_mem_storage: bool
-    api_class: Type[medialibrary_api.BaseMediaItemsRetriever]
+    api_class: Type[json_rpc_api.BaseMediaItemsRetriever]
 
     def __init__(self, tvshowid: Optional[int] = None,
                  season: Optional[int] = None,
@@ -50,15 +50,30 @@ class BaseContentTypeHandler:
         raise NotImplementedError
 
     def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
-        raise NotImplementedError
+        return []
 
 
-class MoviesHandler(BaseContentTypeHandler):
+class PlayableContentMixin:
+
+    def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
+        if media_info['playcount']:
+            caption = f'[COLOR=yellow][B]{_("Mark as unwatched")}[/B][/COLOR]'
+            playcount_to_set = 0
+        else:
+            caption = f'[COLOR=green][B]{_("Mark as watched")}[/B][/COLOR]'
+            playcount_to_set = 1
+        item_id_param = f'{self.mediatype}id'
+        item_id = media_info[item_id_param]
+        command = f'RunScript({ADDON_ID},update_playcount,{item_id_param},{item_id},{playcount_to_set})'
+        return [(caption, command)]
+
+
+class MoviesHandler(PlayableContentMixin, BaseContentTypeHandler):
     content = 'movies'
     mediatype = 'movie'
     item_is_folder = False
     should_save_to_mem_storage = True
-    api_class = medialibrary_api.GetMovies
+    api_class = json_rpc_api.GetMovies
 
     def get_plugin_category(self) -> str:
         return _('Movies')
@@ -66,12 +81,9 @@ class MoviesHandler(BaseContentTypeHandler):
     def get_item_url(self, media_info):
         return f'{VIDEO_URL}/{quote(media_info["file"])}'
 
-    def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
-        return []
-
 
 class RecentMoviesHandler(MoviesHandler):
-    api_class = medialibrary_api.GetRecentlyAddedMovies
+    api_class = json_rpc_api.GetRecentlyAddedMovies
 
     def get_plugin_category(self) -> str:
         return _('Recently added movies')

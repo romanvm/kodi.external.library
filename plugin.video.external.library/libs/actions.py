@@ -14,17 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from typing import Dict, Any
-from urllib.parse import quote, urljoin, parse_qsl
+from urllib.parse import parse_qsl
 
 import xbmcplugin
-from xbmc import InfoTagVideo, Actor
 from xbmcgui import Dialog, ListItem
 
 from libs.content_type_handlers import MoviesHandler, RecentMoviesHandler
 from libs.exceptions import NoDataError, RemoteKodiError
 from libs.kodi_service import (ADDON, ADDON_ID, GettextEmulator,
-                               logger, get_remote_kodi_url, get_plugin_url)
+                               logger, get_plugin_url)
+from libs.media_info_service import set_info, set_art
 from libs.mem_storage import MemStorage
 
 _ = GettextEmulator.gettext
@@ -34,10 +33,6 @@ HANDLE = int(sys.argv[1])
 DIALOG = Dialog()
 
 MEM_STORAGE = MemStorage()
-
-REMOTE_KODI_URL = get_remote_kodi_url(with_credentials=True)
-IMAGE_URL = urljoin(REMOTE_KODI_URL, 'image')
-
 
 CONTENT_TYPE_HANDLERS = {
     'movies': MoviesHandler,
@@ -61,64 +56,6 @@ def root():
                               'thumb': 'DefaultRecentlyAddedMovies.png'})
             url = get_plugin_url(content_type='recent_movies')
             xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
-
-
-def _set_art(list_item: ListItem, raw_art: Dict[str, str]) -> None:
-    art = {art_type: f'{IMAGE_URL}/{quote(raw_url)}' for art_type, raw_url in raw_art.items()}
-    list_item.setArt(art)
-
-
-def _set_info(info_tag: InfoTagVideo, media_info: Dict[str, Any], mediatype: str) -> None:
-    info_tag.setMediaType(mediatype)
-    if year := media_info.get('year'):
-        info_tag.setYear(year)
-    if episode := media_info.get('episode'):
-        info_tag.setEpisode(episode)
-    if season := media_info.get('season'):
-        info_tag.setSeason(season)
-    if ratings := media_info.get('ratings'):
-        for rating_type, rating_info in ratings.items():
-            info_tag.setRating(rating=rating_info.get('rating', 0),
-                               votes=rating_info.get('votes', 0),
-                               type=rating_type,
-                               isdefault=bool(rating_info.get('default')))
-    if (playcount := media_info.get('playcount')) is not None:
-        info_tag.setPlaycount(playcount)
-    if mpaa := media_info.get('mpaa'):
-        info_tag.setMpaa(mpaa)
-    if plot := media_info.get('plot'):
-        info_tag.setPlot(plot)
-    if title := media_info.get('title'):
-        info_tag.setTitle(title)
-    if genres := media_info.get('genre'):
-        info_tag.setGenres(genres)
-    if countries := media_info.get('country'):
-        info_tag.setCountries(countries)
-    if directors := media_info.get('director'):
-        info_tag.setDirectors(directors)
-    if studios := media_info.get('studios'):
-        info_tag.setStudios(studios)
-    if writers := media_info.get('writer'):
-        info_tag.setWriters(writers)
-    if cast := media_info.get('cast'):
-        actors = []
-        for actor_info in cast:
-            actor_thumbnail = actor_info.get('thumbnail', '')
-            if actor_thumbnail:
-                actor_thumbnail = f'{IMAGE_URL}/{quote(actor_thumbnail)}'
-            actors.append(Actor(
-                name=actor_info.get('name', ''),
-                role=actor_info.get('role', ''),
-                order=actor_info.get('order', 0),
-                thumbnail=actor_thumbnail
-            ))
-        if actors:
-            info_tag.setCast(actors)
-    if premiered := media_info.get('premiered'):
-        info_tag.setPremiered(premiered)
-    if resume := media_info.get('resume'):
-        info_tag.setResumePoint(time=resume.get('position', 0.0),
-                                totaltime=resume.get('total', 0.0))
 
 
 def show_media_items(content_type, tvshowid=None, season=None, parent_category=None):
@@ -146,9 +83,9 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
     for media_info in media_items:
         list_item = ListItem(media_info.get('title') or media_info.get('label', ''))
         if art := media_info.get('art'):
-            _set_art(list_item, art)
+            set_art(list_item, art)
         info_tag = list_item.getVideoInfoTag()
-        _set_info(info_tag, media_info, content_type_handler.mediatype)
+        set_info(info_tag, media_info, content_type_handler.mediatype)
         list_item.addContextMenuItems(content_type_handler.get_item_context_menu(media_info))
         directory_items.append((
             content_type_handler.get_item_url(media_info),

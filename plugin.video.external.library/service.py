@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-raise SystemExit(0)
-
 import xbmc
 
 from libs.monitor import PlayMonitor
@@ -22,6 +20,8 @@ from libs.monitor import PlayMonitor
 kodi_monitor = xbmc.Monitor()
 play_monitor = PlayMonitor()
 
-while not kodi_monitor.waitForAbort(0.333):
-    if play_monitor.isPlaying() and play_monitor.is_monitoring:
+while not kodi_monitor.waitForAbort(0.5):
+    if (play_monitor.isPlayingVideo()
+            and not xbmc.getCondVisibility('Player.Paused')
+            and play_monitor.is_monitoring):
         play_monitor.update_time()

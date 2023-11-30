@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# pylint: disable=broad-exception-caught,attribute-defined-outside-init
 
 from urllib.parse import quote
 
@@ -53,13 +54,18 @@ class PlayMonitor(xbmc.Player):
         logger.debug('Started monitoring %s', self._playing_file)
 
     def onPlayBackStopped(self):
-        self._update_watched()
+        self._send_played_file_state()
+        self._clear_state()
+        logger.debug('Stopped monitoring %s', self._playing_file)
 
     def onPlayBackEnded(self):
-        self._update_watched()
+        self._send_played_file_state()
+        self._clear_state()
+        logger.debug('Stopped monitoring %s', self._playing_file)
 
     def onPlayBackPaused(self):
-        self._update_watched()
+        self._send_resume()
+        logger.debug('paused monitoring %s', self._playing_file)
 
     def update_time(self):
         try:
@@ -71,6 +77,8 @@ class PlayMonitor(xbmc.Player):
                 self._total_time = self.getTotalTime()
             except Exception:
                 self._total_time = -1
+        if self._should_send_resume():
+            self._send_resume()
 
     def _get_item_info(self):
         if listing := self._mem_storage.get('__external_library_list__'):
@@ -82,15 +90,28 @@ class PlayMonitor(xbmc.Player):
                     return item
         return None
 
-    def _update_watched(self):
-        self.is_monitoring = False
-        if (self._current_time != -1 and self._total_time != -1 and
-                (self._current_time / self._total_time) >= ADDON.getSettingInt('watched_threshold')):
-            try:
-                content, id_ = self._get_item_info()
-            except RuntimeError:
-                logger.error('Unable to update watched status')
-            else:
-                logger.debug('Updating watched status for %s %s', content[:-1], self._playing_file)
-                medialibrary.update_item_playcount(content, id_, 1)
-        self._playing_file = None
+    def _should_send_playcount(self):
+        watched_threshold = ADDON.getSettingInt('watched_threshold_percent') / 100
+        return (self._current_time != -1 and self._total_time != -1
+                and (self._current_time / self._total_time) >= watched_threshold)
+
+    def _send_playcount(self):
+        logger.debug('Updating playcount for %s %s', self._item_info, self._playing_file)
+        item_id_param = self._item_info['item_id_param']
+        new_playcount = self._item_info['playcount'] + 1
+        json_rpc_api.update_playcount(item_id_param, self._item_info[item_id_param], new_playcount)
+
+    def _should_send_resume(self):
+        return self._current_time != -1 and self._total_time != -1
+
+    def _send_resume(self):
+        logger.debug('Updating resume for %s %s', self._item_info, self._playing_file)
+        item_id_param = self._item_info['item_id_param']
+        json_rpc_api.update_resume(item_id_param, self._item_info[item_id_param],
+                                   self._current_time, self._total_time)
+
+    def _send_played_file_state(self):
+        if self._should_send_playcount():
+            self._send_playcount()
+        if self._should_send_resume():
+            self._send_resume()

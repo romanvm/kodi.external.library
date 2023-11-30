@@ -42,8 +42,6 @@
           </control>
         </setting>
         <!--
-        <setting id="show_recent_movies" type="bool"
-          label="32004" default="true" enable="eq(-1,true)" />
 
         <setting id="show_tvshows" type="bool"
           label="32005" default="true" />
@@ -81,6 +79,18 @@
           <level>0</level>
           <default>false</default>
           <control type="toggle"/>
+        </setting>
+        <setting id="watched_threshold_percent" type="integer" label="32012" help="">
+          <level>0</level>
+          <default>97</default>
+          <constraints>
+            <minimum>90</minimum>
+            <step>1</step>
+            <maximum>100</maximum>
+          </constraints>
+          <control type="slider" format="percentage">
+            <popup>false</popup>
+          </control>
         </setting>
       </group>
     </category>

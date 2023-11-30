@@ -153,10 +153,10 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
         url = content_type_handler.get_item_url(media_info)
         directory_items.append((url, list_item, content_type_handler.item_is_folder))
         if content_type_handler.should_save_to_mem_storage:
-            content_id_key = f'{content_type_handler.mediatype}id'
+            item_id_param = f'{content_type_handler.mediatype}id'
             mem_storage_items.append({
-                'mediatype': content_type_handler.mediatype,
-                content_id_key: media_info[content_id_key],
+                'item_id_param': item_id_param,
+                item_id_param: media_info[item_id_param],
                 'file': media_info['file'],
             })
     xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))

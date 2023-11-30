@@ -29,23 +29,28 @@ class PlayMonitor(xbmc.Player):
     """
     def __init__(self):
         super().__init__()
-        self._storage = MemStorage()
+        self._mem_storage = MemStorage()
+        self._clear_state()
+
+    def _clear_state(self):
         self.is_monitoring = False
         self._current_time = -1
         self._total_time = -1
         self._playing_file = None
-        self._listing = None
+        self._item_info = None
 
     def onPlayBackStarted(self):
-        if ml.REMOTE_KODI_URL in self.getPlayingFile():
-            self._playing_file = self.getPlayingFile()
-            self.is_monitoring = True
-            self._listing = self._storage['__external_library_list__']
-            logger.debug('Started monitoring %s', self._playing_file)
-            try:
-                self._total_time = self.getTotalTime()
-            except Exception:
-                self._total_time = -1
+        self._playing_file = self.getPlayingFile()
+        self._item_info = self._get_item_info()
+        if self._item_info is None:
+            self._clear_state()
+            return
+        self.is_monitoring = True
+        try:
+            self._total_time = self.getTotalTime()
+        except Exception:
+            self._total_time = -1
+        logger.debug('Started monitoring %s', self._playing_file)
 
     def onPlayBackStopped(self):
         self._update_watched()
@@ -68,16 +73,14 @@ class PlayMonitor(xbmc.Player):
                 self._total_time = -1
 
     def _get_item_info(self):
-        for item in self._listing:
-            if quote(item['file']) in self._playing_file:
-                if 'movieid' in item:
-                    content = 'movies'
-                    id_ = item['movieid']
-                else:
-                    content = 'episodes'
-                    id_ = item['episodeid']
-                return content, id_
-        raise RuntimeError(f'Played item {self._playing_file} is not in listing!')
+        if listing := self._mem_storage.get('__external_library_list__'):
+            files_on_shares = ADDON.getSettingBool('files_on_shares')
+            for item in listing:
+                if files_on_shares and item['file'] == self._playing_file:
+                    return item
+                if quote(item['file']) in self._playing_file:
+                    return item
+        return None
 
     def _update_watched(self):
         self.is_monitoring = False

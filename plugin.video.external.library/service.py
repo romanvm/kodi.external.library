@@ -15,13 +15,16 @@
 
 import xbmc
 
+from libs.exception_logger import catch_exception
+from libs.kodi_service import logger
 from libs.monitor import PlayMonitor
 
-kodi_monitor = xbmc.Monitor()
-play_monitor = PlayMonitor()
+with catch_exception(logger.error):
+    kodi_monitor = xbmc.Monitor()
+    play_monitor = PlayMonitor()
 
-while not kodi_monitor.waitForAbort(0.5):
-    if (play_monitor.isPlayingVideo()
-            and not xbmc.getCondVisibility('Player.Paused')
-            and play_monitor.is_monitoring):
-        play_monitor.update_time()
+    while not kodi_monitor.waitForAbort(0.5):
+        if (play_monitor.isPlayingVideo()
+                and not xbmc.getCondVisibility('Player.Paused')
+                and play_monitor.is_monitoring):
+            play_monitor.update_time()

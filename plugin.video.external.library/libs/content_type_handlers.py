@@ -13,11 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import enum
 from typing import Type, List, Dict, Any, Optional, Tuple
 from urllib.parse import urljoin, quote
 
 from libs import json_rpc_api
-from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID, ADDON
+from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID, ADDON, get_plugin_url
+
+__all__ = [
+    'MoviesHandler',
+    'RecentMoviesHandler',
+    'TvShowsHandler',
+    'SeasonsHandler',
+    'EpisodesHandler',
+    'RecentEpisodesHandler',
+]
 
 _ = GettextEmulator.gettext
 
@@ -91,3 +101,67 @@ class RecentMoviesHandler(MoviesHandler):
 
     def get_plugin_category(self) -> str:
         return _('Recently added movies')
+
+
+class TvShowsHandler(BaseContentTypeHandler):
+    content = 'tvshows'
+    mediatype = 'tvshow'
+    item_is_folder = True
+    should_save_to_mem_storage = False
+    api_class = json_rpc_api.GetTVShows
+
+    class FlattenSeasons(enum.IntEnum):
+        NEVER = 0
+        IF_ONE_SEASON = 1
+        ALWAYS = 2
+
+    def get_plugin_category(self) -> str:
+        return _('TV Shows')
+
+    def get_item_url(self, media_info: Dict[str, Any]) -> str:
+        parent_category = media_info.get('title') or media_info['label']
+        tvshowid = media_info['tvshowid']
+        if ADDON.getSettingInt('flatten_seasons') == self.FlattenSeasons.ALWAYS:
+            return get_plugin_url(content_type='episodes', tvshowid=tvshowid,
+                                  parent_category=parent_category)
+        if ADDON.getSettingInt('flatten_seasons') == self.FlattenSeasons.IF_ONE_SEASON:
+            seasons = json_rpc_api.GetSeasons('seasons', media_info['tvshowid']).get_media_items()
+            if len(seasons) == 1:
+                return get_plugin_url(content_type='episodes', tvshowid=tvshowid,
+                                      parent_category=parent_category)
+        return get_plugin_url(content_type='seasons', tvshowid=tvshowid, parent_category=parent_category)
+
+
+class SeasonsHandler(BaseContentTypeHandler):
+    content = 'seasons'
+    mediatype = 'season'
+    item_is_folder = True
+    should_save_to_mem_storage = False
+    api_class = json_rpc_api.GetSeasons
+
+    def get_plugin_category(self) -> str:
+        return f'{self._parent_category} / {_("Seasons")}'
+
+    def get_item_url(self, media_info: Dict[str, Any]) -> str:
+        season_title = media_info.get('title') or media_info['label']
+        parent_category = f'{media_info["showtitle"]} / {season_title}'
+        return get_plugin_url(content_type='episodes', tvshowid=media_info['tvshowid'],
+                              season=self._season, parent_category=parent_category)
+
+
+class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):
+    content = 'episodes'
+    mediatype = 'episode'
+    item_is_folder = False
+    should_save_to_mem_storage = True
+    api_class = json_rpc_api.GetEpisodes
+
+    def get_plugin_category(self) -> str:
+        return self._parent_category
+
+
+class RecentEpisodesHandler(EpisodesHandler):
+    api_class = json_rpc_api.GetRecentlyAddedEpisodes
+
+    def get_plugin_category(self) -> str:
+        return _('Recently added episodes')

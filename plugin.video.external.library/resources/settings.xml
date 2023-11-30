@@ -71,7 +71,7 @@
             <dependency type="visible" setting="show_tvshows">true</dependency>
           </dependencies>
         </setting>
-        <setting id="flatten_tvshows" type="integer" label="32009" help="">
+        <setting id="flatten_seasons" type="integer" label="32009" help="">
           <level>0</level>
           <default>1</default>
           <constraints>

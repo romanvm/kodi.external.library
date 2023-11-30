@@ -19,7 +19,7 @@ from urllib.parse import parse_qsl
 import xbmcplugin
 from xbmcgui import Dialog, ListItem
 
-from libs.content_type_handlers import MoviesHandler, RecentMoviesHandler
+from libs.content_type_handlers import *
 from libs.exceptions import NoDataError, RemoteKodiError
 from libs.kodi_service import (ADDON, ADDON_ID, GettextEmulator,
                                logger, get_plugin_url)
@@ -37,6 +37,10 @@ MEM_STORAGE = MemStorage()
 CONTENT_TYPE_HANDLERS = {
     'movies': MoviesHandler,
     'recent_movies': RecentMoviesHandler,
+    'tvshows': TvShowsHandler,
+    'seasons': SeasonsHandler,
+    'episodes': EpisodesHandler,
+    'recent_episodes': RecentEpisodesHandler,
 }
 
 
@@ -55,6 +59,17 @@ def root():
             list_item.setArt({'icon': 'DefaultRecentlyAddedMovies.png',
                               'thumb': 'DefaultRecentlyAddedMovies.png'})
             url = get_plugin_url(content_type='recent_movies')
+            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    if ADDON.getSettingBool('show_tvshows'):
+        list_item = ListItem(f'[{_("TV Shows")}]')
+        list_item.setArt({'icon': 'DefaultTVShows.png', 'thumb': 'DefaultTVShows.png'})
+        url = get_plugin_url(content_type='tvshows')
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+        if ADDON.getSettingBool('show_recent_episodes'):
+            list_item = ListItem(f'[{_("Recently added episodes")}]')
+            list_item.setArt({'icon': 'DefaultRecentlyAddedEpisodes.png',
+                              'thumb': 'DefaultRecentlyAddedEpisodes.png'})
+            url = get_plugin_url(content_type='recent_episodes')
             xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
 
 

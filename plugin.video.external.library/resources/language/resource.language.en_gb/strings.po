@@ -98,3 +98,7 @@ msgstr ""
 msgctxt "#32022"
 msgid "Playback"
 msgstr ""
+
+msgctxt "#32023"
+msgid "Seasons"
+msgstr ""

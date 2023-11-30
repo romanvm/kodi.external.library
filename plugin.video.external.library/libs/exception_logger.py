@@ -154,6 +154,7 @@ def format_exception(exc_obj: Optional[Exception] = None) -> str:
     return message
 
 
+# pylint: disable=line-too-long
 @contextmanager
 def catch_exception(logger_func: Callable[[str], None] = _log_error) -> Generator[None, None, None]:
     """

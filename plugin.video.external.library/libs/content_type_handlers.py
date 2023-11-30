@@ -25,6 +25,7 @@ REMOTE_KODI_URL = get_remote_kodi_url(with_credentials=True)
 VIDEO_URL = urljoin(REMOTE_KODI_URL, 'vfs')
 
 
+# pylint: disable=unused-argument
 class BaseContentTypeHandler:
     content: str
     mediatype: str
@@ -64,7 +65,8 @@ class PlayableContentMixin:
             playcount_to_set = 1
         item_id_param = f'{self.mediatype}id'
         item_id = media_info[item_id_param]
-        command = f'RunScript({ADDON_ID},update_playcount,{item_id_param},{item_id},{playcount_to_set})'
+        command = f'RunScript({ADDON_ID},' \
+                  f'update_playcount,{item_id_param},{item_id},{playcount_to_set})'
         return [(caption, command)]
 
     def get_item_url(self, media_info: Dict[str, Any]) -> str:

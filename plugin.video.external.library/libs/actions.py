@@ -29,14 +29,14 @@ from libs.mem_storage import MemStorage
 
 _ = GettextEmulator.gettext
 
-PLUGIN_URL = f'plugin://{ADDON_ID}/'
 HANDLE = int(sys.argv[1])
 
 DIALOG = Dialog()
 
+MEM_STORAGE = MemStorage()
+
 REMOTE_KODI_URL = get_remote_kodi_url(with_credentials=True)
 IMAGE_URL = urljoin(REMOTE_KODI_URL, 'image')
-VIDEO_URL = urljoin(REMOTE_KODI_URL, 'vfs')
 
 
 CONTENT_TYPE_HANDLERS = {
@@ -150,18 +150,21 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
         info_tag = list_item.getVideoInfoTag()
         _set_info(info_tag, media_info, content_type_handler.mediatype)
         list_item.addContextMenuItems(content_type_handler.get_item_context_menu(media_info))
-        url = content_type_handler.get_item_url(media_info)
-        directory_items.append((url, list_item, content_type_handler.item_is_folder))
+        directory_items.append((
+            content_type_handler.get_item_url(media_info),
+            list_item,
+            content_type_handler.item_is_folder,
+        ))
         if content_type_handler.should_save_to_mem_storage:
             item_id_param = f'{content_type_handler.mediatype}id'
             mem_storage_items.append({
                 'item_id_param': item_id_param,
                 item_id_param: media_info[item_id_param],
                 'file': media_info['file'],
+                'playcount': media_info.get('playcount', 0),
             })
     xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))
-    mem_storage = MemStorage()
-    mem_storage['__external_library_list__'] = mem_storage_items
+    MEM_STORAGE['__external_library_list__'] = mem_storage_items
     logger.debug('Finished creating a list of %s items.', content_type)
 
 

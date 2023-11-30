@@ -86,7 +86,9 @@ class logger:  # pylint: disable=invalid-name
 
 
 class GettextEmulator:
-    """Emulate GNU Gettext by mapping resource.language.en_gb UI strings to their numeric string IDs"""
+    """
+    Emulate GNU Gettext by mapping resource.language.en_gb UI strings to their numeric string IDs
+    """
     _instance = None
 
     class LocalizationError(Exception):  # pylint: disable=missing-docstring
@@ -98,9 +100,11 @@ class GettextEmulator:
         return cls._instance
 
     def __init__(self):
-        self._en_gb_string_po_path = ADDON_DIR / 'resources' / 'language' / 'resource.language.en_gb' / 'strings.po'
+        self._en_gb_string_po_path = (ADDON_DIR / 'resources' / 'language'
+                                      / 'resource.language.en_gb' / 'strings.po')
         if not self._en_gb_string_po_path.exists():
-            raise self.LocalizationError('Missing resource.language.en_gb strings.po localization file')
+            raise self.LocalizationError(
+                'Missing resource.language.en_gb strings.po localization file')
         if not ADDON_PROFILE_DIR.exists():
             ADDON_PROFILE_DIR.mkdir()
         self._string_mapping_path = ADDON_PROFILE_DIR / 'strings-map.json'
@@ -161,7 +165,8 @@ class GettextEmulator:
             string_id = emulator.strings_mapping[en_string]
         except KeyError as exc:
             raise cls.LocalizationError(
-                f'Unable to find "{en_string}" string in resource.language.en_gb/strings.po') from exc
+                f'Unable to find "{en_string}" string in resource.language.en_gb/strings.po'
+            ) from exc
         return ADDON.getLocalizedString(string_id)
 
 

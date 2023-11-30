@@ -41,19 +41,6 @@
             <hidden>true</hidden>
           </control>
         </setting>
-        <!--
-
-        <setting id="show_tvshows" type="bool"
-          label="32005" default="true" />
-
-        <setting id="flatten_tvshows" type="enum" lvalues="20420|20421|20422"
-          label="32009" default="1" enable="eq(-1,true)" />
-
-        <setting id="show_recent_episodes" type="bool"
-          label="32006" default="true" enable="eq(-2,true)" />
-
-        <setting label="32012" type="slider" id="watched_threshold" default="0.97" range="0.9,0.1,1.0" option="float" />
-        -->
       </group>
     </category>
     <category id="sections" label="32021" help="">
@@ -69,6 +56,34 @@
           <control type="toggle"/>
           <dependencies>
             <dependency type="visible" setting="show_movies">true</dependency>
+          </dependencies>
+        </setting>
+        <setting id="show_tvshows" type="boolean" label="32005" help="">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
+        <setting id="show_recent_episodes" type="boolean" label="32006" help="">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+          <dependencies>
+            <dependency type="visible" setting="show_tvshows">true</dependency>
+          </dependencies>
+        </setting>
+        <setting id="flatten_tvshows" type="integer" label="32009" help="">
+          <level>0</level>
+          <default>1</default>
+          <constraints>
+            <options>
+              <option label="20420">0</option>
+              <option label="20421">1</option>
+              <option label="20422">2</option>
+            </options>
+          </constraints>
+          <control type="spinner" format="string"/>
+          <dependencies>
+            <dependency type="visible" setting="show_tvshows">true</dependency>
           </dependencies>
         </setting>
       </group>

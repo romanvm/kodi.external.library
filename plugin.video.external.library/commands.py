@@ -26,6 +26,7 @@ _ = GettextEmulator.gettext
 
 
 def main():
+    logger.debug('Executing command: %s', str(sys.argv))
     if len(sys.argv) == 1:
         xbmcgui.Dialog().ok(_('External Kodi Videolibrary Client'),
                             _(r'Please run this addon from \"Video addons\" section.'))

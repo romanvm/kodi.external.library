@@ -56,16 +56,17 @@ class PlayMonitor(xbmc.Player):
     def onPlayBackStopped(self):
         self._send_played_file_state()
         self._clear_state()
-        logger.debug('Stopped monitoring %s', self._playing_file)
+        logger.debug('Stopped monitoring %s. Playback stopped.', self._playing_file)
 
     def onPlayBackEnded(self):
         self._send_played_file_state()
         self._clear_state()
-        logger.debug('Stopped monitoring %s', self._playing_file)
+        logger.debug('Stopped monitoring %s. Playback ended.', self._playing_file)
 
     def onPlayBackPaused(self):
-        self._send_resume()
-        logger.debug('paused monitoring %s', self._playing_file)
+        if self._should_send_resume():
+            self._send_resume()
+        logger.debug('Paused monitoring %s', self._playing_file)
 
     def update_time(self):
         try:
@@ -77,8 +78,6 @@ class PlayMonitor(xbmc.Player):
                 self._total_time = self.getTotalTime()
             except Exception:
                 self._total_time = -1
-        if self._should_send_resume():
-            self._send_resume()
 
     def _get_item_info(self):
         if listing := self._mem_storage.get('__external_library_list__'):
@@ -113,5 +112,5 @@ class PlayMonitor(xbmc.Player):
     def _send_played_file_state(self):
         if self._should_send_playcount():
             self._send_playcount()
-        if self._should_send_resume():
+        elif self._should_send_resume():
             self._send_resume()

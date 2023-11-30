@@ -73,7 +73,7 @@ class PlayMonitor(xbmc.Player):
             self._current_time = self.getTime()
         except Exception:
             self._current_time = -1
-        if self._total_time == -1:
+        if self._total_time <= 0:
             try:
                 self._total_time = self.getTotalTime()
             except Exception:
@@ -91,7 +91,7 @@ class PlayMonitor(xbmc.Player):
 
     def _should_send_playcount(self):
         watched_threshold = ADDON.getSettingInt('watched_threshold_percent') / 100
-        return (self._current_time != -1 and self._total_time != -1
+        return (self._current_time != -1 and self._total_time > 0
                 and (self._current_time / self._total_time) >= watched_threshold)
 
     def _send_playcount(self):

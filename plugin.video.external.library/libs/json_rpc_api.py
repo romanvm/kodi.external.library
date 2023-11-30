@@ -192,7 +192,12 @@ SET_DETAILS_API_MAP = {
 def update_playcount(item_id_param, item_id, playcount):
     api_class = SET_DETAILS_API_MAP[item_id_param]
     api = api_class()
-    api.set_details(**{item_id_param: item_id, 'playcount': playcount})
+    kwargs = {
+        item_id_param: item_id,
+        'playcount': playcount,
+        'resume': {'position': 0.0, 'total': 0.0},
+    }
+    api.set_details(**kwargs)
 
 
 def update_resume(item_id_param, item_id, position, total):

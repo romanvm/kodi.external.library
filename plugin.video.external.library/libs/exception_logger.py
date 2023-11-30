@@ -125,8 +125,8 @@ def format_trace(frames_to_exclude: int = 1) -> str:
         to skip unnecessary info. Since each function call creates a stack frame
         you need to exclude at least this function frame.
     """
-    frames = inspect.stack(5)
-    return _format_stack_trace(frames[frames_to_exclude:])
+    frames = inspect.stack(5)[frames_to_exclude:]
+    return _format_stack_trace(reversed(frames))
 
 
 def format_exception(exc_obj: Optional[Exception] = None) -> str:
@@ -188,6 +188,6 @@ def catch_exception(logger_func: Callable[[str], None] = _log_error) -> Generato
         yield
     except Exception as exc:
         message = format_exception(exc)
-        logger_func('*********************************** Unhandled exception detected ***********************************\n'
+        logger_func('\n*********************************** Unhandled exception detected ***********************************\n'
                     + message)
         raise

@@ -17,6 +17,8 @@ import enum
 from typing import Type, List, Dict, Any, Optional, Tuple, Iterable
 from urllib.parse import urljoin, quote
 
+import xbmcplugin
+
 from libs import json_rpc_api
 from libs.kodi_service import GettextEmulator, get_remote_kodi_url, ADDON_ID, ADDON, get_plugin_url
 
@@ -66,6 +68,20 @@ class BaseContentTypeHandler:
     def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
         return []
 
+    def get_sort_methods(self) -> List[int]:
+        return [
+            xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE,
+            xbmcplugin.SORT_METHOD_TITLE,
+            xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE,
+            xbmcplugin.SORT_METHOD_LABEL,
+            xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+            xbmcplugin.SORT_METHOD_COUNTRY,
+            xbmcplugin.SORT_METHOD_STUDIO,
+            xbmcplugin.SORT_METHOD_GENRE,
+            xbmcplugin.SORT_METHOD_MPAA_RATING,
+            xbmcplugin.SORT_METHOD_PLAYCOUNT,
+        ]
+
 
 class PlayableContentMixin:
 
@@ -103,6 +119,9 @@ class RecentMoviesHandler(MoviesHandler):
 
     def get_plugin_category(self) -> str:
         return _('Recently added movies')
+
+    def get_sort_methods(self) -> List[int]:
+        return []
 
 
 class TvShowsHandler(BaseContentTypeHandler):
@@ -152,6 +171,13 @@ class SeasonsHandler(BaseContentTypeHandler):
         return get_plugin_url(content_type='episodes', tvshowid=media_info['tvshowid'],
                               season=media_info['season'], parent_category=parent_category)
 
+    def get_sort_methods(self) -> List[int]:
+        return [
+            xbmcplugin.SORT_METHOD_TITLE,
+            xbmcplugin.SORT_METHOD_LABEL,
+            xbmcplugin.SORT_METHOD_PLAYCOUNT,
+        ]
+
 
 class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):
     mediatype = 'episode'
@@ -162,9 +188,18 @@ class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):
     def get_plugin_category(self) -> str:
         return self._parent_category
 
+    def get_sort_methods(self) -> List[int]:
+        return [
+            xbmcplugin.SORT_METHOD_EPISODE,
+            xbmcplugin.SORT_METHOD_DATE,
+        ] + super().get_sort_methods()
+
 
 class RecentEpisodesHandler(EpisodesHandler):
     api_class = json_rpc_api.GetRecentlyAddedEpisodes
 
     def get_plugin_category(self) -> str:
         return _('Recently added episodes')
+
+    def get_sort_methods(self) -> List[int]:
+        return []

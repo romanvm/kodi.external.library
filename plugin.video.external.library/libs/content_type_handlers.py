@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import enum
-from typing import Type, List, Dict, Any, Optional, Tuple
+from typing import Type, List, Dict, Any, Optional, Tuple, Iterable
 from urllib.parse import urljoin, quote
 
 from libs import json_rpc_api
@@ -37,7 +37,6 @@ VIDEO_URL = urljoin(REMOTE_KODI_URL, 'vfs')
 
 # pylint: disable=unused-argument
 class BaseContentTypeHandler:
-    content: str
     mediatype: str
     item_is_folder: bool
     should_save_to_mem_storage: bool
@@ -51,8 +50,12 @@ class BaseContentTypeHandler:
         self._parent_category = parent_category
         self._api = self.api_class(self.content, self._tvshowid, self._season)
 
-    def get_media_items(self) -> List[Dict[str, Any]]:
-        return self._api.get_media_items()
+    @property
+    def content(self) -> str:
+        return f'{self.mediatype}s'
+
+    def get_media_items(self) -> Iterable[Dict[str, Any]]:
+        yield from self._api.get_media_items()
 
     def get_plugin_category(self) -> str:
         raise NotImplementedError
@@ -86,7 +89,6 @@ class PlayableContentMixin:
 
 
 class MoviesHandler(PlayableContentMixin, BaseContentTypeHandler):
-    content = 'movies'
     mediatype = 'movie'
     item_is_folder = False
     should_save_to_mem_storage = True
@@ -104,7 +106,6 @@ class RecentMoviesHandler(MoviesHandler):
 
 
 class TvShowsHandler(BaseContentTypeHandler):
-    content = 'tvshows'
     mediatype = 'tvshow'
     item_is_folder = True
     should_save_to_mem_storage = False
@@ -118,6 +119,11 @@ class TvShowsHandler(BaseContentTypeHandler):
     def get_plugin_category(self) -> str:
         return _('TV Shows')
 
+    def get_media_items(self) -> Iterable[Dict[str, Any]]:
+        for media_item in super().get_media_items():
+            if media_item['episode']:
+                yield media_item
+
     def get_item_url(self, media_info: Dict[str, Any]) -> str:
         parent_category = media_info.get('title') or media_info['label']
         tvshowid = media_info['tvshowid']
@@ -125,15 +131,13 @@ class TvShowsHandler(BaseContentTypeHandler):
             return get_plugin_url(content_type='episodes', tvshowid=tvshowid,
                                   parent_category=parent_category)
         if ADDON.getSettingInt('flatten_seasons') == self.FlattenSeasons.IF_ONE_SEASON:
-            seasons = json_rpc_api.GetSeasons('seasons', media_info['tvshowid']).get_media_items()
-            if len(seasons) == 1:
+            if media_info['season'] == 1:
                 return get_plugin_url(content_type='episodes', tvshowid=tvshowid,
                                       parent_category=parent_category)
         return get_plugin_url(content_type='seasons', tvshowid=tvshowid, parent_category=parent_category)
 
 
 class SeasonsHandler(BaseContentTypeHandler):
-    content = 'seasons'
     mediatype = 'season'
     item_is_folder = True
     should_save_to_mem_storage = False
@@ -150,7 +154,6 @@ class SeasonsHandler(BaseContentTypeHandler):
 
 
 class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):
-    content = 'episodes'
     mediatype = 'episode'
     item_is_folder = False
     should_save_to_mem_storage = True

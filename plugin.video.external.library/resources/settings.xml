@@ -95,7 +95,19 @@
           <default>false</default>
           <control type="toggle"/>
         </setting>
-        <setting id="watched_threshold_percent" type="integer" label="32012" help="">
+        <setting id="playtime_to_skip" type="integer" label="32024" help="32025">
+          <level>0</level>
+          <default>60</default>
+          <constraints>
+            <minimum>30</minimum>
+            <step>30</step>
+            <maximum>120</maximum>
+          </constraints>
+          <control type="slider" format="integer">
+            <popup>false</popup>
+          </control>
+        </setting>
+        <setting id="watched_threshold_percent" type="integer" label="32012" help="32026">
           <level>0</level>
           <default>97</default>
           <constraints>

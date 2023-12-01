@@ -101,7 +101,9 @@ class PlayMonitor(xbmc.Player):
         json_rpc_api.update_playcount(item_id_param, self._item_info[item_id_param], new_playcount)
 
     def _should_send_resume(self):
-        return self._current_time != -1 and self._total_time != -1
+        return (self._current_time != -1
+                and self._total_time != -1
+                and self._current_time > ADDON.getSettingInt('playtime_to_skip'))
 
     def _send_resume(self):
         logger.debug('Updating resume for %s %s', self._item_info, self._playing_file)

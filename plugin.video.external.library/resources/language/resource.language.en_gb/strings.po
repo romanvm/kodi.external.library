@@ -102,3 +102,15 @@ msgstr ""
 msgctxt "#32023"
 msgid "Seasons"
 msgstr ""
+
+msgctxt "#32024"
+msgid "Playtime to start tracking progress (seconds)"
+msgstr ""
+
+msgctxt "#32025"
+msgid "Playtime after which the plugin starts tracking playback progress."
+msgstr ""
+
+msgctxt "#32026"
+msgid "Playback percentage after which the plugin marks a played video as watched."
+msgstr ""

@@ -146,7 +146,7 @@ class SeasonsHandler(BaseContentTypeHandler):
         season_title = media_info.get('title') or media_info['label']
         parent_category = f'{media_info["showtitle"]} / {season_title}'
         return get_plugin_url(content_type='episodes', tvshowid=media_info['tvshowid'],
-                              season=self._season, parent_category=parent_category)
+                              season=media_info['season'], parent_category=parent_category)
 
 
 class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):

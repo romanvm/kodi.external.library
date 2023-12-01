@@ -106,18 +106,14 @@ class GetMovies(BaseMediaItemsRetriever):
         'mpaa',
         'cast',
         'country',
-        'set',
         'streamdetails',
         'top250',
         'votes',
         'file',
         'sorttitle',
         'resume',
-        'setid',
         'dateadded',
-        'tag',
         'art',
-        'ratings',
         'premiered',
     ]
     sort = {'order': 'ascending', 'method': 'label'}
@@ -131,12 +127,30 @@ class GetRecentlyAddedMovies(GetMovies):
 class GetTVShows(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetTVShows'
     properties = [
-        'plot',
+        'title',
         'genre',
-        'cast',
         'year',
+        'rating',
+        'plot',
         'studio',
+        'mpaa',
+        'cast',
+        'episode',
+        'playcount',
+        'premiered',
+        'votes',
+        'file',
+        'originaltitle',
+        'sorttitle',
+        'season',
+        'watchedepisodes',
+        'dateadded',
+        'tag',
         'art',
+        'userrating',
+        'ratings',
+        'runtime',
+        'uniqueid',
     ]
     sort = {'order': 'ascending', 'method': 'label'}
 
@@ -144,10 +158,14 @@ class GetTVShows(BaseMediaItemsRetriever):
 class GetSeasons(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetSeasons'
     properties = [
-        'showtitle',
         'season',
+        'showtitle',
+        'playcount',
+        'episode',
         'tvshowid',
+        'watchedepisodes',
         'art',
+        'title',
     ]
     sort = {'order': 'ascending', 'method': 'season'}
 
@@ -155,19 +173,31 @@ class GetSeasons(BaseMediaItemsRetriever):
 class GetEpisodes(BaseMediaItemsRetriever):
     method = 'VideoLibrary.GetEpisodes'
     properties = [
-        'showtitle',
+        'title',
+        'plot',
+        'votes',
+        'rating',
+        'writer',
+        'firstaired',
+        'playcount',
+        'runtime',
+        'director',
+        'productioncode',
         'season',
         'episode',
-        'title',
-        'tvshowid',
+        'originaltitle',
+        'showtitle',
         'cast',
-        'firstaired',
-        'director',
-        'plot',
+        'streamdetails',
         'file',
-        'playcount',
         'resume',
+        'tvshowid',
+        'dateadded',
+        'uniqueid',
         'art',
+        'specialsortseason',
+        'specialsortepisode',
+        'seasonid',
     ]
     sort = {'order': 'ascending', 'method': 'label'}
 

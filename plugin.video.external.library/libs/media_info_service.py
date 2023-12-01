@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Dict, Any, List, Tuple, Type
+from typing import Dict, Any, List, Tuple, Type, Iterable, Union
 from urllib.parse import urljoin, quote
 
+import xbmc
 from xbmc import InfoTagVideo, Actor
 from xbmcgui import ListItem
 
@@ -25,6 +26,8 @@ __all__ = ['set_info', 'set_art']
 
 REMOTE_KODI_URL = get_remote_kodi_url(with_credentials=True)
 IMAGE_URL = urljoin(REMOTE_KODI_URL, 'image')
+
+StreamDetailsType = Union[xbmc.VideoStreamDetail, xbmc.AudioStreamDetail, xbmc.SubtitleStreamDetail]
 
 
 class SimpleMediaPropertySetter:
@@ -40,25 +43,13 @@ class SimpleMediaPropertySetter:
     def should_set(self) -> bool:
         return bool(self._property_value)
 
-    def get_method_args(self) -> Tuple[Any, ...]:
+    def get_method_args(self) -> Iterable[Any]:
         return (self._property_value,)
 
     def set_info_tag_property(self, info_tag: InfoTagVideo) -> None:
         args = self.get_method_args()
         method = getattr(info_tag, self._info_tag_method)
         method(*args)
-
-
-class RatingsSetter(SimpleMediaPropertySetter):
-
-    def get_method_args(self) -> Tuple[Any, ...]:
-        ratings = {}
-        defaultrating = ''
-        for rating_type, rating_info in self._property_value.items():
-            ratings[rating_type] = (rating_info.get('rating', 0.0), rating_info.get('votes', 0))
-            if rating_info.get('default'):
-                defaultrating = rating_type
-        return ratings, defaultrating
 
 
 class PlaycountSetter(SimpleMediaPropertySetter):
@@ -69,7 +60,7 @@ class PlaycountSetter(SimpleMediaPropertySetter):
 
 class CastSetter(SimpleMediaPropertySetter):
 
-    def get_method_args(self) -> Tuple[Any, ...]:
+    def get_method_args(self) -> Iterable[Any]:
         actors = []
         for actor_info in self._property_value:
             actor_thumbnail = actor_info.get('thumbnail', '')
@@ -86,10 +77,87 @@ class CastSetter(SimpleMediaPropertySetter):
 
 class ResumePointSetter(SimpleMediaPropertySetter):
 
-    def get_method_args(self) -> Tuple[Any, ...]:
+    def get_method_args(self) -> Iterable[Any]:
         time = self._property_value.get('position', 0.0)
         totaltime = self._property_value.get('total', 0.0)
         return time, totaltime
+
+
+class VideoStreamSetter(SimpleMediaPropertySetter):
+    stream_type = 'video'
+    stream_type_class = xbmc.VideoStreamDetail
+
+    def should_set(self) -> bool:
+        return bool(self._property_value and self._property_value.get(self.stream_type))
+
+    @staticmethod
+    def get_stream_type_args(stream_dict: Dict[str, Any]) -> Iterable[Any,]:
+        return (
+            stream_dict['width'],
+            stream_dict['height'],
+            stream_dict['aspect'],
+            stream_dict['duration'],
+            stream_dict['codec'],
+            stream_dict['stereomode'],
+            stream_dict['language'],
+            stream_dict['hdrtype'],
+        )
+
+    def _get_stream_type_object(self, stream_dict) -> StreamDetailsType:
+        args = self.get_stream_type_args(stream_dict)
+        return self.stream_type_class(*args)
+
+    def get_method_args(self) -> Iterable[Any]:
+        args_list = []
+        for stream_dict in self._property_value[self.stream_type]:
+            stream_type_obj = self._get_stream_type_object(stream_dict)
+            args_list.append(stream_type_obj)
+        return args_list
+
+    def set_info_tag_property(self, info_tag: InfoTagVideo) -> None:
+        method = getattr(info_tag, self._info_tag_method)
+        args_list = self.get_method_args()
+        for arg in args_list:
+            method(arg)
+
+
+class AudioStreamSetter(VideoStreamSetter):
+    stream_type = 'audio'
+    stream_type_class = xbmc.AudioStreamDetail
+
+    @staticmethod
+    def get_stream_type_args(stream_dict: Dict[str, Any]) -> Iterable[Any]:
+        return (
+            stream_dict['channels'],
+            stream_dict['codec'],
+            stream_dict['language'],
+        )
+
+
+class SubtitleStreamSetter(VideoStreamSetter):
+    stream_type = 'subtitle'
+    stream_type_class = xbmc.SubtitleStreamDetail
+
+    @staticmethod
+    def get_stream_type_args(stream_dict: Dict[str, Any]) -> Iterable[Any]:
+        return (stream_dict['language'],)
+
+
+class NonNegativeValueSetter(SimpleMediaPropertySetter):
+
+    def should_set(self) -> bool:
+        return self._property_value is not None and self._property_value >= 0
+
+
+class IntAsStringValueSetter(SimpleMediaPropertySetter):
+
+    def should_set(self) -> bool:
+        return bool(self._property_value
+                    and self._property_value.isdigit()
+                    and int(self._property_value))
+
+    def get_method_args(self) -> Iterable[Any]:
+        return (int(self._property_value),)
 
 
 # The list of 3 element tuples: (
@@ -97,43 +165,11 @@ class ResumePointSetter(SimpleMediaPropertySetter):
 #   xbmc.InfoTagVideo method name,
 #   media property handler class,
 # )
-"""
-[
-    'title',
-    'genre',
-    'year',
-    'director',
-    'trailer',
-    'tagline',
-    'plot',
-    'plotoutline',
-    'originaltitle',
-    'playcount',
-    'writer',
-    'studio',
-    'mpaa',
-    'cast',
-    'country',
-    'set',
-    'streamdetails',
-    'top250',
-    'votes',
-    'file',
-    'sorttitle',
-    'resume',
-    'setid',
-    'dateadded',
-    'tag',
-    'art',
-    'userrating',
-    'ratings',
-    'premiered',
-]
-"""
 MEDIA_PROPERTIES: List[Tuple[str, str, Type[SimpleMediaPropertySetter]]] = [
     ('title', 'setTitle', SimpleMediaPropertySetter),
     ('genre', 'setGenres', SimpleMediaPropertySetter),
     ('year', 'setYear', SimpleMediaPropertySetter),
+    ('rating', 'setRating', SimpleMediaPropertySetter),
     ('director', 'setDirectors', SimpleMediaPropertySetter),
     ('trailer', 'setTrailer', SimpleMediaPropertySetter),
     ('tagline', 'setTagLine', SimpleMediaPropertySetter),
@@ -145,14 +181,21 @@ MEDIA_PROPERTIES: List[Tuple[str, str, Type[SimpleMediaPropertySetter]]] = [
     ('mpaa', 'setMpaa', SimpleMediaPropertySetter),
     ('cast', 'setCast', CastSetter),
     ('country', 'setCountries', SimpleMediaPropertySetter),
-    ('set', 'setSet', SimpleMediaPropertySetter),
-
+    ('streamdetails', 'addVideoStream', VideoStreamSetter),
+    ('streamdetails', 'addAudioStream', AudioStreamSetter),
+    ('streamdetails', 'addSubtitleStream', SubtitleStreamSetter),
+    ('top250', 'setTop250', SimpleMediaPropertySetter),
+    ('votes', 'setVotes', IntAsStringValueSetter),
+    ('sorttitle', 'setSortTitle', SimpleMediaPropertySetter),
     ('resume', 'setResumePoint', ResumePointSetter),
-
-    ('ratings', 'setRatings', RatingsSetter),
+    ('dateadded', 'setDateAdded', SimpleMediaPropertySetter),
     ('premiered', 'setPremiered', SimpleMediaPropertySetter),
     ('season', 'setSeason', SimpleMediaPropertySetter),
     ('episode', 'setEpisode', SimpleMediaPropertySetter),
+    ('showtitle', 'setTvShowTitle', SimpleMediaPropertySetter),
+    ('productioncode', 'setProductionCode', SimpleMediaPropertySetter),
+    ('specialsortseason', 'setSortSeason', NonNegativeValueSetter),
+    ('specialsortepisode', 'setSortEpisode', NonNegativeValueSetter),
 ]
 
 

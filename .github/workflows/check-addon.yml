@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -q typing-extensions
-        pip install -q requirements.txt
+        pip install -q -r requirements.txt
     - name: Check with Pylint
       run: |
         pylint plugin.video.external.library/libs \

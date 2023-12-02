@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Classes and functions responsible for interacting with the remote JSON-RPC API"""
 
 import logging
 from pprint import pformat

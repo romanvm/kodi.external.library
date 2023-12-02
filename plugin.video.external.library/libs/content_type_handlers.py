@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Classes that are responsible for processing supported content types: Movies, TV Shows etc."""
 
 import enum
 from typing import Type, List, Dict, Any, Optional, Tuple, Iterable

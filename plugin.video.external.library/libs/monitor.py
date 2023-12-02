@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pylint: disable=broad-exception-caught,attribute-defined-outside-init
+"""Playback progress monitor"""
 
 import logging
 from urllib.parse import quote

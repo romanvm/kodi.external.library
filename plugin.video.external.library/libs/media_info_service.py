@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+Classes and functions that process data from JSON-RPC API and assign them to ListItem instances
+"""
 
 from typing import Dict, Any, List, Tuple, Type, Iterable, Union
 from urllib.parse import urljoin, quote

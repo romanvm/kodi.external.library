@@ -17,7 +17,6 @@
 import hashlib
 import json
 import logging
-import logging.config
 import re
 from pathlib import Path
 from urllib.parse import urlencode

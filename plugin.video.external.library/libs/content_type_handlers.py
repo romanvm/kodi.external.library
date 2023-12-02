@@ -153,7 +153,8 @@ class TvShowsHandler(BaseContentTypeHandler):
             if media_info['season'] == 1:
                 return get_plugin_url(content_type='episodes', tvshowid=tvshowid,
                                       parent_category=parent_category)
-        return get_plugin_url(content_type='seasons', tvshowid=tvshowid, parent_category=parent_category)
+        return get_plugin_url(content_type='seasons', tvshowid=tvshowid,
+                              parent_category=parent_category)
 
 
 class SeasonsHandler(BaseContentTypeHandler):

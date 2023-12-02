@@ -20,6 +20,7 @@ from urllib.parse import parse_qsl
 import xbmcplugin
 from xbmcgui import Dialog, ListItem
 
+# pylint: disable=wildcard-import, unused-wildcard-import
 from libs.content_type_handlers import *
 from libs.exceptions import NoDataError, RemoteKodiError
 from libs.kodi_service import ADDON, ADDON_ID, GettextEmulator, get_plugin_url

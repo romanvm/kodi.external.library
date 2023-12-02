@@ -59,16 +59,6 @@ class KodiLogHandler(logging.Handler):
         xbmc.log(message, level=kodi_log_level)
 
 
-def initialize_logging():
-    logging.basicConfig(
-        format=LOG_FORMAT,
-        style='{',
-        level=logging.DEBUG,
-        handlers=[KodiLogHandler()],
-        force=True
-    )
-
-
 class GettextEmulator:
     """
     Emulate GNU Gettext by mapping resource.language.en_gb UI strings to their numeric string IDs
@@ -152,6 +142,16 @@ class GettextEmulator:
                 f'Unable to find "{en_string}" string in resource.language.en_gb/strings.po'
             ) from exc
         return ADDON.getLocalizedString(string_id)
+
+
+def initialize_logging():
+    logging.basicConfig(
+        format=LOG_FORMAT,
+        style='{',
+        level=logging.DEBUG,
+        handlers=[KodiLogHandler()],
+        force=True
+    )
 
 
 def get_plugin_url(**kwargs):

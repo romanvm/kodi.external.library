@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.external.library"
-    version="0.0.4"
+    version="1.0.0b1"
     name="External Kodi Videolibrary Client"
     provider-name="Roman V.M.">
   <requires>

@@ -86,6 +86,19 @@
             <dependency type="visible" setting="show_tvshows">true</dependency>
           </dependencies>
         </setting>
+        <setting id="show_music_videos" type="boolean" label="32027" help="">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
+        <setting id="show_recent_music_videos" type="boolean" label="32028" help="">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+          <dependencies>
+            <dependency type="visible" setting="show_music_videos">true</dependency>
+          </dependencies>
+        </setting>
       </group>
     </category>
     <category id="playback" label="32022" help="">

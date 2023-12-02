@@ -27,6 +27,8 @@ from libs.content_type_handlers import (
     SeasonsHandler,
     EpisodesHandler,
     RecentEpisodesHandler,
+    MusicVideosHandler,
+    RecentMusicVideosHandler,
 )
 from libs.exceptions import NoDataError, RemoteKodiError
 from libs.kodi_service import ADDON, ADDON_ID, GettextEmulator, get_plugin_url
@@ -49,6 +51,8 @@ CONTENT_TYPE_HANDLERS = {
     'seasons': SeasonsHandler,
     'episodes': EpisodesHandler,
     'recent_episodes': RecentEpisodesHandler,
+    'music_videos': MusicVideosHandler,
+    'recent_music_videos': RecentMusicVideosHandler,
 }
 
 
@@ -79,6 +83,18 @@ def root():
                               'thumb': 'DefaultRecentlyAddedEpisodes.png'})
             url = get_plugin_url(content_type='recent_episodes')
             xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    if ADDON.getSettingBool('show_music_videos'):
+        list_item = ListItem(f'[{_("Music videos")}]')
+        list_item.setArt({'icon': 'DefaultMusicVideos.png', 'thumb': 'DefaultMusicVideos.png'})
+        url = get_plugin_url(content_type='music_videos')
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+        if ADDON.getSettingBool('show_recent_music_videos'):
+            list_item = ListItem(f'[{_("Recently added music video")}]')
+            list_item.setArt({'icon': 'DefaultRecentlyAddedMusicVideos.png',
+                              'thumb': 'DefaultRecentlyAddedMusicVideos.png'})
+            url = get_plugin_url(content_type='recent_music_videos')
+            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    xbmcplugin.endOfDirectory(HANDLE)
 
 
 def show_media_items(content_type, tvshowid=None, season=None, parent_category=None):
@@ -128,6 +144,7 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
     for sort_method in content_type_handler.get_sort_methods():
         xbmcplugin.addSortMethod(HANDLE, sort_method)
     logger.debug('Finished creating a list of %s items.', content_type)
+    xbmcplugin.endOfDirectory(HANDLE)
 
 
 def router(paramstring):
@@ -135,11 +152,10 @@ def router(paramstring):
     logger.debug('Called addon with params: %s', str(sys.argv))
     if 'content_type' not in params:
         root()
-    else:
-        if (tvshowid := params.get('tvshowid')) is not None:
-            tvshowid = int(tvshowid)
-        if (season := params.get('season')) is not None:
-            season = int(season)
-        parent_category = params.get('parent_category')
-        show_media_items(params['content_type'], tvshowid, season, parent_category)
-    xbmcplugin.endOfDirectory(HANDLE)
+        return
+    if (tvshowid := params.get('tvshowid')) is not None:
+        tvshowid = int(tvshowid)
+    if (season := params.get('season')) is not None:
+        season = int(season)
+    parent_category = params.get('parent_category')
+    show_media_items(params['content_type'], tvshowid, season, parent_category)

@@ -196,6 +196,9 @@ MEDIA_PROPERTIES: List[Tuple[str, str, Type[SimpleMediaPropertySetter]]] = [
     ('productioncode', 'setProductionCode', SimpleMediaPropertySetter),
     ('specialsortseason', 'setSortSeason', NonNegativeValueSetter),
     ('specialsortepisode', 'setSortEpisode', NonNegativeValueSetter),
+    ('album', 'setAlbum', SimpleMediaPropertySetter),
+    ('artist', 'setArtists', SimpleMediaPropertySetter),
+    ('track', 'setTrack', NonNegativeValueSetter),
 ]
 
 

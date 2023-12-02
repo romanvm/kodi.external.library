@@ -89,7 +89,7 @@ def root():
         url = get_plugin_url(content_type='music_videos')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
         if ADDON.getSettingBool('show_recent_music_videos'):
-            list_item = ListItem(f'[{_("Recently added music video")}]')
+            list_item = ListItem(f'[{_("Recently added music videos")}]')
             list_item.setArt({'icon': 'DefaultRecentlyAddedMusicVideos.png',
                               'thumb': 'DefaultRecentlyAddedMusicVideos.png'})
             url = get_plugin_url(content_type='recent_music_videos')

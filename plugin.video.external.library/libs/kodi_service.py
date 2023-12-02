@@ -43,6 +43,7 @@ LOG_FORMAT = '[{addon_id} v.{addon_version}] {filename}:{lineno} - {message}'
 
 
 class KodiLogHandler(logging.Handler):
+    """Logging handler that writes to the Kodi log with correct levels"""
     LEVEL_MAP = {
         logging.NOTSET: xbmc.LOGNONE,
         logging.DEBUG: xbmc.LOGDEBUG,
@@ -56,10 +57,12 @@ class KodiLogHandler(logging.Handler):
     def emit(self, record):
         record.addon_id = ADDON_ID
         record.addon_version = ADDON_VERSION
-        if record.exc_info is not None:
-            record.exc_text = format_exception(record.exc_info[1])
-        if record.stack_info is not None:
-            record.stack_info = format_trace(7)
+        extended_trace_info = getattr(self, 'extended_trace_info', False)
+        if extended_trace_info:
+            if record.exc_info is not None:
+                record.exc_text = format_exception(record.exc_info[1])
+            if record.stack_info is not None:
+                record.stack_info = format_trace(7)
         message = self.format(record)
         kodi_log_level = self.LEVEL_MAP.get(record.levelno, xbmc.LOGDEBUG)
         xbmc.log(message, level=kodi_log_level)
@@ -150,12 +153,22 @@ class GettextEmulator:
         return ADDON.getLocalizedString(string_id)
 
 
-def initialize_logging():
+def initialize_logging(extended_trace_info=True):
+    """
+    Initialize the root logger that writes to the Kodi log
+
+    After initialization, you can use Python logging facilities as usual.
+
+    :param extended_trace_info: write extended trace info when exc_info=True
+        or stack_info=True parameters are passed to logging methods.
+    """
+    handler = KodiLogHandler()
+    handler.extended_trace_info = extended_trace_info
     logging.basicConfig(
         format=LOG_FORMAT,
         style='{',
         level=logging.DEBUG,
-        handlers=[KodiLogHandler()],
+        handlers=[handler],
         force=True
     )
 

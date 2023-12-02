@@ -31,7 +31,7 @@ _ = GettextEmulator.gettext
 def main():
     logger.debug('Executing command: %s', str(sys.argv))
     if len(sys.argv) == 1:
-        xbmcgui.Dialog().ok(_('External Kodi Videolibrary Client'),
+        xbmcgui.Dialog().ok(_('Kodi External Video Library Client'),
                             _(r'Please run this addon from \"Video addons\" section.'))
     elif sys.argv[1] == 'update_playcount':
         update_playcount(sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))

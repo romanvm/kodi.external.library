@@ -225,3 +225,6 @@ class RecentMusicVideosHandler(MusicVideosHandler):
 
     def get_plugin_category(self) -> str:
         return _('Recently added music videos')
+
+    def get_sort_methods(self) -> List[int]:
+        return []

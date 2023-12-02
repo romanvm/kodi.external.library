@@ -40,3 +40,8 @@ Those are limitations of the Kodi addon API.
 ## Installation
 
 Currently, this plugin is being actively developed and no installation files are available.
+
+
+## Credits
+
+The addon icon was borrowed from [Aeon Nox 5: SiLVO](https://github.com/MikeSiLVO/Aeon-Nox-SiLVO) skin.

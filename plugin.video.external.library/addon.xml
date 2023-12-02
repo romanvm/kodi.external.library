@@ -19,5 +19,7 @@
     <assets>
       <icon>icon.png</icon>
     </assets>
+    <source>https://github.com/romanvm/kodi.external.library</source>
+    <news>1.0.0: Initial public release.</news>
   </extension>
 </addon>

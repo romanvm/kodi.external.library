@@ -84,6 +84,8 @@ class BaseContentTypeHandler:
 
 
 class PlayableContentMixin:
+    item_is_folder = False
+    should_save_to_mem_storage = True
 
     def get_item_context_menu(self, media_info: Dict[str, Any]) -> List[Tuple[str, str]]:
         if media_info['playcount']:
@@ -106,8 +108,6 @@ class PlayableContentMixin:
 
 class MoviesHandler(PlayableContentMixin, BaseContentTypeHandler):
     mediatype = 'movie'
-    item_is_folder = False
-    should_save_to_mem_storage = True
     api_class = json_rpc_api.GetMovies
 
     def get_plugin_category(self) -> str:
@@ -182,8 +182,6 @@ class SeasonsHandler(BaseContentTypeHandler):
 
 class EpisodesHandler(PlayableContentMixin, BaseContentTypeHandler):
     mediatype = 'episode'
-    item_is_folder = False
-    should_save_to_mem_storage = True
     api_class = json_rpc_api.GetEpisodes
 
     def get_plugin_category(self) -> str:
@@ -204,3 +202,26 @@ class RecentEpisodesHandler(EpisodesHandler):
 
     def get_sort_methods(self) -> List[int]:
         return []
+
+
+class MusicVideosHandler(PlayableContentMixin, BaseContentTypeHandler):
+    mediatype = 'musicvideo'
+    api_class = json_rpc_api.GetMusicVideos
+
+    def get_plugin_category(self) -> str:
+        return _('Music videos')
+
+    def get_sort_methods(self) -> List[int]:
+        return [
+            xbmcplugin.SORT_METHOD_ALBUM,
+            xbmcplugin.SORT_METHOD_ARTIST,
+            xbmcplugin.SORT_METHOD_ARTIST_IGNORE_THE,
+            xbmcplugin.SORT_METHOD_TRACKNUM,
+        ] + super().get_sort_methods()
+
+
+class RecentMusicVideosHandler(MusicVideosHandler):
+    api_class = json_rpc_api.GetRecentlyAddedMusicVideos
+
+    def get_plugin_category(self) -> str:
+        return _('Recently added music videos')

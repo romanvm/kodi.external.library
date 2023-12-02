@@ -114,3 +114,11 @@ msgstr ""
 msgctxt "#32026"
 msgid "Playback percentage after which the plugin marks a played video as watched."
 msgstr ""
+
+msgctxt "#32027"
+msgid "Music videos"
+msgstr ""
+
+msgctxt "#32028"
+msgid "Recently added music videos"
+msgstr ""

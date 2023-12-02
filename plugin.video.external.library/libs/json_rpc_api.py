@@ -210,6 +210,37 @@ class GetRecentlyAddedEpisodes(GetEpisodes):
     sort = {'order': 'descending', 'method': 'dateadded'}
 
 
+class GetMusicVideos(BaseMediaItemsRetriever):
+    method = 'VideoLibrary.GetMusicVideos'
+    properties = [
+            'title',
+            'playcount',
+            'runtime',
+            'director',
+            'studio',
+            'year',
+            'plot',
+            'album',
+            'artist',
+            'genre',
+            'track',
+            'streamdetails',
+            'lastplayed',
+            'file',
+            'resume',
+            'dateadded',
+            'art',
+            'rating',
+            'premiered',
+        ]
+    sort = {'order': 'ascending', 'method': 'label'}
+
+
+class GetRecentlyAddedMusicVideos(GetMusicVideos):
+    method = 'VideoLibrary.GetRecentlyAddedMusicVideos'
+    sort = {'order': 'descending', 'method': 'dateadded'}
+
+
 class SetMovieDetails(BaseJsonRpcApi):
     method = 'VideoLibrary.SetMovieDetails'
 

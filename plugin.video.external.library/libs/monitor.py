@@ -14,13 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # pylint: disable=broad-exception-caught,attribute-defined-outside-init
 
+import logging
 from urllib.parse import quote
 
 import xbmc
 
 from libs import json_rpc_api
-from libs.kodi_service import logger, ADDON
+from libs.kodi_service import ADDON
 from libs.mem_storage import MemStorage
+
+logger = logging.getLogger(__name__)
 
 
 class PlayMonitor(xbmc.Player):

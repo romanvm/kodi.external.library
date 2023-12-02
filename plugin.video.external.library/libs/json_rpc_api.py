@@ -13,12 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 from pprint import pformat
 from typing import List, Dict, Any
 
 from libs import simple_requests as requests
 from libs.exceptions import NoDataError, RemoteKodiError
-from libs.kodi_service import ADDON, logger, get_remote_kodi_url
+from libs.kodi_service import ADDON, get_remote_kodi_url
+
+logger = logging.getLogger(__name__)
 
 
 class BaseJsonRpcApi:

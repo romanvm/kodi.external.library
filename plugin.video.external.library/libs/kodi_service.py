@@ -15,9 +15,9 @@
 
 """Classes and functions to interact with Kodi API"""
 import hashlib
-import inspect
 import json
-import os
+import logging
+import logging.config
 import re
 from pathlib import Path
 from urllib.parse import urlencode
@@ -25,8 +25,6 @@ from urllib.parse import urlencode
 import xbmc
 from xbmcaddon import Addon
 from xbmcvfs import translatePath
-
-from libs.exception_logger import format_trace, format_exception
 
 ADDON = Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
@@ -39,50 +37,36 @@ ADDON_PROFILE_DIR = Path(translatePath(ADDON.getAddonInfo('profile')))
 
 PLUGIN_URL = f'plugin://{ADDON_ID}/'
 
+LOG_FORMAT = '[{addon_id} v.{addon_version}] {filename}:{lineno} - {message}'
 
-class logger:  # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
-    FORMAT = '[{id} v.{version}] - {filename}:{lineno} - {message}'
 
-    @classmethod
-    def _write_message(cls, message, *args, trace=False, exc_info=False, level=xbmc.LOGDEBUG):
-        if trace and exc_info:
-            raise ValueError('"trace" and "exc_info" parameters cannot be used a the same time')
-        if args:
-            message = message % args
-        curr_frame = inspect.currentframe()
-        formatted_message = cls.FORMAT.format(
-            id=ADDON_ID,
-            version=ADDON_VERSION,
-            filename=os.path.basename(curr_frame.f_back.f_back.f_code.co_filename),
-            lineno=curr_frame.f_back.f_back.f_lineno,
-            message=message
-        )
-        if trace:
-            formatted_message += '\n' + format_trace(3)
-        if exc_info:
-            formatted_message += '\n' + format_exception()
-        xbmc.log(formatted_message, level)
+class KodiLogHandler(logging.Handler):
+    LEVEL_MAP = {
+        logging.NOTSET: xbmc.LOGNONE,
+        logging.DEBUG: xbmc.LOGDEBUG,
+        logging.INFO: xbmc.LOGINFO,
+        logging.WARN: xbmc.LOGWARNING,
+        logging.WARNING: xbmc.LOGWARNING,
+        logging.ERROR: xbmc.LOGERROR,
+        logging.CRITICAL: xbmc.LOGFATAL,
+    }
 
-    @classmethod
-    def info(cls, message, *args, trace=False, exc_info=False):
-        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGINFO)
+    def emit(self, record):
+        record.addon_id = ADDON_ID
+        record.addon_version = ADDON_VERSION
+        message = self.format(record)
+        kodi_log_level = self.LEVEL_MAP.get(record.levelno, xbmc.LOGDEBUG)
+        xbmc.log(message, level=kodi_log_level)
 
-    @classmethod
-    def warning(cls, message, *args, trace=False, exc_info=False):
-        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGWARNING)
 
-    @classmethod
-    def error(cls, message, *args, trace=False, exc_info=False):
-        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGERROR)
-
-    @classmethod
-    def exception(cls, message, *args):
-        cls.error(message, *args, exc_info=True)
-
-    @classmethod
-    def debug(cls, message, *args, trace=False, exc_info=False):
-        cls._write_message(message, *args, trace=trace, exc_info=exc_info, level=xbmc.LOGDEBUG)
+def initialize_logging():
+    logging.basicConfig(
+        format=LOG_FORMAT,
+        style='{',
+        level=logging.DEBUG,
+        handlers=[KodiLogHandler()],
+        force=True
+    )
 
 
 class GettextEmulator:

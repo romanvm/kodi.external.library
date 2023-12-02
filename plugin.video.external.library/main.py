@@ -14,10 +14,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
+import logging
 
 from libs.actions import router
 from libs.exception_logger import catch_exception
-from libs.kodi_service import logger
+from libs.kodi_service import initialize_logging
+
+initialize_logging()
+logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     with catch_exception(logger.error):

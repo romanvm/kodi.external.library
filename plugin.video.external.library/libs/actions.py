@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 import sys
 from urllib.parse import parse_qsl
 
@@ -21,11 +22,11 @@ from xbmcgui import Dialog, ListItem
 
 from libs.content_type_handlers import *
 from libs.exceptions import NoDataError, RemoteKodiError
-from libs.kodi_service import (ADDON, ADDON_ID, GettextEmulator,
-                               logger, get_plugin_url)
+from libs.kodi_service import ADDON, ADDON_ID, GettextEmulator, get_plugin_url
 from libs.media_info_service import set_info, set_art
 from libs.mem_storage import MemStorage
 
+logger = logging.getLogger(__name__)
 _ = GettextEmulator.gettext
 
 HANDLE = int(sys.argv[1])

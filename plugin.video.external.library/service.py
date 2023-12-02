@@ -13,11 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+
 import xbmc
 
 from libs.exception_logger import catch_exception
-from libs.kodi_service import logger
+from libs.kodi_service import initialize_logging
 from libs.monitor import PlayMonitor
+
+initialize_logging()
+logger = logging.getLogger(__name__)
 
 with catch_exception(logger.error):
     logger.debug('Starting playback monitoring service...')

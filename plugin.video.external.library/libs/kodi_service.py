@@ -162,6 +162,7 @@ def initialize_logging(extended_trace_info=True):
         or stack_info=True parameters are passed to logging methods.
     """
     handler = KodiLogHandler()
+    # pylint: disable=attribute-defined-outside-init
     handler.extended_trace_info = extended_trace_info
     logging.basicConfig(
         format=LOG_FORMAT,

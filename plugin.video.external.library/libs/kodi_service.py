@@ -26,6 +26,8 @@ import xbmc
 from xbmcaddon import Addon
 from xbmcvfs import translatePath
 
+from libs.exception_logger import format_trace, format_exception
+
 ADDON = Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
@@ -54,6 +56,10 @@ class KodiLogHandler(logging.Handler):
     def emit(self, record):
         record.addon_id = ADDON_ID
         record.addon_version = ADDON_VERSION
+        if record.exc_info is not None:
+            record.exc_text = format_exception(record.exc_info[1])
+        if record.stack_info is not None:
+            record.stack_info = format_trace(7)
         message = self.format(record)
         kodi_log_level = self.LEVEL_MAP.get(record.levelno, xbmc.LOGDEBUG)
         xbmc.log(message, level=kodi_log_level)

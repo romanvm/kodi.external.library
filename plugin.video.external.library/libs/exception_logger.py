@@ -96,12 +96,12 @@ EXCEPTION_TEMPLATE = """
 ####################################################################################################
                                      Exception Diagnostic Info
 ----------------------------------------------------------------------------------------------------
-Exception type  : {exc_type}
-Exception value : {exc}
-System info     : {system_info}
-Python version  : {python_version}
-Kodi version    : {kodi_version}
-sys.argv        : {sys_argv}
+Exception type    : {exc_type}
+Exception message : {exc}
+System info       : {system_info}
+Python version    : {python_version}
+Kodi version      : {kodi_version}
+sys.argv          : {sys_argv}
 ----------------------------------------------------------------------------------------------------
 sys.path:
 {sys_path}
@@ -140,7 +140,8 @@ def format_exception(exc_obj: Optional[Exception] = None) -> str:
         _, exc_obj, _ = sys.exc_info()
     if exc_obj is None:
         raise ValueError('No exception is currently being handled')
-    stack_trace_info = _format_stack_trace(inspect.trace(5))
+    stack_trace = inspect.getinnerframes(exc_obj.__traceback__, context=5)
+    stack_trace_info = _format_stack_trace(stack_trace)
     message = EXCEPTION_TEMPLATE.format(
         exc_type=exc_obj.__class__.__name__,
         exc=exc_obj,
@@ -154,7 +155,6 @@ def format_exception(exc_obj: Optional[Exception] = None) -> str:
     return message
 
 
-# pylint: disable=line-too-long
 @contextmanager
 def catch_exception(logger_func: Callable[[str], None] = _log_error) -> Generator[None, None, None]:
     """
@@ -188,6 +188,7 @@ def catch_exception(logger_func: Callable[[str], None] = _log_error) -> Generato
         yield
     except Exception as exc:
         message = format_exception(exc)
+        # pylint: disable=line-too-long
         logger_func('\n*********************************** Unhandled exception detected ***********************************\n'
                     + message)
         raise

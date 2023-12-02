@@ -1,0 +1,31 @@
+name: Check addon
+
+on: [push, pull_request]
+
+jobs:
+  check:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.8"
+    - name: Install dependencies
+      run: |
+        pip install -q typing-extensions
+        pip install -q requirements.txt
+    - name: Check with Pylint
+      run: |
+        pylint plugin.video.external.library/libs \
+            plugin.video.external.library/main.py \
+            plugin.video.external.library/commands.py \
+            plugin.video.external.library/service.py
+    - name: Install addon checker
+      run: |
+        pip install -q kodi-addon-checker
+    - name: Check with addon-checker
+      run: |
+        kodi-addon-checker --branch nexus

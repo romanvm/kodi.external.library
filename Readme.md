@@ -41,6 +41,19 @@ Those are limitations of the Kodi addon API.
 
 Currently, this plugin is being actively developed and no installation files are available.
 
+## Setup
+
+### Remote Kodi
+
+In "**Settings**" > "**Services**" > "**Control**" section enable the built-in web-server and remote control
+as shown on the screenshot.
+
+![Control Section](https://raw.githubusercontent.com/romanvm/kodi.external.library/master/screenshots/kodi-webserver-settings.png)
+
+### Plugin Settings
+
+In the first section ("**Access**") enter the host address of your remote Kodi instance.
+Also provide the port number, login and password configured on the previous step.
 
 ## Credits
 

@@ -45,3 +45,7 @@ Currently, this plugin is being actively developed and no installation files are
 ## Credits
 
 The addon icon was borrowed from [Aeon Nox 5: SiLVO](https://github.com/MikeSiLVO/Aeon-Nox-SiLVO) skin.
+
+## License
+
+[GPL v.3](https://www.gnu.org/licenses/gpl-3.0.html)

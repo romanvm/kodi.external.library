@@ -28,4 +28,4 @@ jobs:
         pip install -q kodi-addon-checker
     - name: Check with addon-checker
       run: |
-        kodi-addon-checker --branch nexus
+        kodi-addon-checker --branch nexus plugin.video.external.library

@@ -19,5 +19,6 @@
     <assets>
       <icon>icon.png</icon>
     </assets>
+    <news>1.0.0: Initial public release.</news>
   </extension>
 </addon>

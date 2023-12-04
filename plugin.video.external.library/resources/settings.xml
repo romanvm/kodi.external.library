@@ -54,9 +54,6 @@
           <level>0</level>
           <default>true</default>
           <control type="toggle"/>
-          <dependencies>
-            <dependency type="visible" setting="show_movies">true</dependency>
-          </dependencies>
         </setting>
         <setting id="show_tvshows" type="boolean" label="32005" help="">
           <level>0</level>
@@ -67,9 +64,6 @@
           <level>0</level>
           <default>true</default>
           <control type="toggle"/>
-          <dependencies>
-            <dependency type="visible" setting="show_tvshows">true</dependency>
-          </dependencies>
         </setting>
         <setting id="flatten_seasons" type="integer" label="32009" help="">
           <level>0</level>
@@ -82,9 +76,6 @@
             </options>
           </constraints>
           <control type="spinner" format="string"/>
-          <dependencies>
-            <dependency type="visible" setting="show_tvshows">true</dependency>
-          </dependencies>
         </setting>
         <setting id="show_music_videos" type="boolean" label="32027" help="">
           <level>0</level>
@@ -95,9 +86,6 @@
           <level>0</level>
           <default>true</default>
           <control type="toggle"/>
-          <dependencies>
-            <dependency type="visible" setting="show_music_videos">true</dependency>
-          </dependencies>
         </setting>
       </group>
     </category>

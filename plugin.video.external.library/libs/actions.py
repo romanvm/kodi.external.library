@@ -60,40 +60,40 @@ def root():
     """Root action"""
     xbmcplugin.setPluginCategory(HANDLE,
                                  _('Kodi Medialibrary on {kodi_host}').format(
-                                     kodi_host=ADDON.getSetting('kodi_host')))
+                                     kodi_host=ADDON.getSettingString('kodi_host')))
     if ADDON.getSettingBool('show_movies'):
         list_item = ListItem(f'[{_("Movies")}]')
         list_item.setArt({'icon': 'DefaultMovies.png', 'thumb': 'DefaultMovies.png'})
         url = get_plugin_url(content_type='movies')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
-        if ADDON.getSettingBool('show_recent_movies'):
-            list_item = ListItem(f'[{_("Recently added movies")}]')
-            list_item.setArt({'icon': 'DefaultRecentlyAddedMovies.png',
-                              'thumb': 'DefaultRecentlyAddedMovies.png'})
-            url = get_plugin_url(content_type='recent_movies')
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    if ADDON.getSettingBool('show_recent_movies'):
+        list_item = ListItem(f'[{_("Recently added movies")}]')
+        list_item.setArt({'icon': 'DefaultRecentlyAddedMovies.png',
+                          'thumb': 'DefaultRecentlyAddedMovies.png'})
+        url = get_plugin_url(content_type='recent_movies')
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
     if ADDON.getSettingBool('show_tvshows'):
         list_item = ListItem(f'[{_("TV Shows")}]')
         list_item.setArt({'icon': 'DefaultTVShows.png', 'thumb': 'DefaultTVShows.png'})
         url = get_plugin_url(content_type='tvshows')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
-        if ADDON.getSettingBool('show_recent_episodes'):
-            list_item = ListItem(f'[{_("Recently added episodes")}]')
-            list_item.setArt({'icon': 'DefaultRecentlyAddedEpisodes.png',
-                              'thumb': 'DefaultRecentlyAddedEpisodes.png'})
-            url = get_plugin_url(content_type='recent_episodes')
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    if ADDON.getSettingBool('show_recent_episodes'):
+        list_item = ListItem(f'[{_("Recently added episodes")}]')
+        list_item.setArt({'icon': 'DefaultRecentlyAddedEpisodes.png',
+                          'thumb': 'DefaultRecentlyAddedEpisodes.png'})
+        url = get_plugin_url(content_type='recent_episodes')
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
     if ADDON.getSettingBool('show_music_videos'):
         list_item = ListItem(f'[{_("Music videos")}]')
         list_item.setArt({'icon': 'DefaultMusicVideos.png', 'thumb': 'DefaultMusicVideos.png'})
         url = get_plugin_url(content_type='music_videos')
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
-        if ADDON.getSettingBool('show_recent_music_videos'):
-            list_item = ListItem(f'[{_("Recently added music videos")}]')
-            list_item.setArt({'icon': 'DefaultRecentlyAddedMusicVideos.png',
-                              'thumb': 'DefaultRecentlyAddedMusicVideos.png'})
-            url = get_plugin_url(content_type='recent_music_videos')
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
+    if ADDON.getSettingBool('show_recent_music_videos'):
+        list_item = ListItem(f'[{_("Recently added music videos")}]')
+        list_item.setArt({'icon': 'DefaultRecentlyAddedMusicVideos.png',
+                          'thumb': 'DefaultRecentlyAddedMusicVideos.png'})
+        url = get_plugin_url(content_type='recent_music_videos')
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, isFolder=True)
 
 
 def show_media_items(content_type, tvshowid=None, season=None, parent_category=None):

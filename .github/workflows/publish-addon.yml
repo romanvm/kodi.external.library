@@ -1,0 +1,46 @@
+name: Publish addon
+
+on:
+  push:
+    tags:
+      - '*'
+      - '!*a*'
+      - '!*b*'
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v1
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        pip install -q typing-extensions
+        pip install -q -r requirements.txt
+    - name: Check with Pylint
+      run: |
+        pylint plugin.video.external.library/libs \
+            plugin.video.external.library/main.py \
+            plugin.video.external.library/commands.py \
+            plugin.video.external.library/service.py
+    - name: Install addon checker
+      run: |
+        pip install -q kodi-addon-checker
+    - name: Check with addon-checker
+      run: |
+        kodi-addon-checker --branch nexus
+    - name: Install addon submitter
+      run: |
+        pip install -q git+https://github.com/xbmc/kodi-addon-submitter.git
+    - name: Submit addon
+      run: |
+        submit-addon -r repo-plugins -b nexus -s --pull-request plugin.video.external.library
+      env:
+        GH_USERNAME: romanvm
+        GH_TOKEN: ${{ secrets.gh_token }}
+        EMAIL: roman1972@gmail.com

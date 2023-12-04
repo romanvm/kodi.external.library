@@ -41,7 +41,7 @@ import json as _json
 import ssl
 from base64 import b64encode
 from email.message import Message
-from typing import Optional, Dict, Any, Tuple, Union, List
+from typing import Optional, Dict, Any, Tuple, Union, List, BinaryIO
 from urllib import request as url_request
 from urllib.error import HTTPError as _HTTPError
 from urllib.parse import urlparse, urlencode
@@ -147,9 +147,19 @@ def _create_request(url_structure, params=None, data=None, headers=None, auth=No
     if json is not None:
         body = _json.dumps(json).encode('utf-8')
         prepared_headers['Content-Type'] = 'application/json'
-    if body is None and data is not None:
+    if body is None and isinstance(data, dict):
         body = urlencode(data, doseq=True).encode('ascii')
         prepared_headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    if body is None and isinstance(data, bytes):
+        body = data
+    if body is None and isinstance(data, str):
+        body = data.encode('utf-8')
+    if body is None and hasattr(data, 'read'):
+        body = data.read()
+        if hasattr(data, 'close'):
+            data.close()
+    if body is not None and 'Content-Type' not in prepared_headers:
+        prepared_headers['Content-Type'] = 'application/octet-stream'
     if auth is not None:
         encoded_credentials = b64encode((auth[0] + ':' + auth[1]).encode('utf-8')).decode('ascii')
         prepared_headers['Authorization'] = f'Basic {encoded_credentials}'
@@ -160,7 +170,7 @@ def _create_request(url_structure, params=None, data=None, headers=None, auth=No
 
 def post(url: str,
          params: Optional[Dict[str, Any]] = None,
-         data: Optional[Dict[str, Any]] = None,
+         data: Optional[Union[Dict[str, Any], str, bytes, BinaryIO]] = None,
          headers: Optional[Dict[str, str]] = None,
          auth: Optional[Tuple[str, str]] = None,
          timeout: Optional[float] = None,
@@ -174,8 +184,10 @@ def post(url: str,
 
     :param url: URL
     :param params: URL query params
-    :param data: request payload as form data. If "data" or "json" are passed
-        then a POST request is sent
+    :param data: request payload as dict, str, bytes or a binary file object.
+        If "data" or "json" is passed then a POST request is sent.
+        For str, bytes or file object it's caller's responsibility to provide a proper
+        'Content-Type' header.
     :param headers: additional headers
     :param auth: a tuple of (login, password) for Basic authentication
     :param timeout: request timeout in seconds

@@ -42,7 +42,11 @@ LOG_FORMAT = '[{addon_id} v.{addon_version}] {filename}:{lineno} - {message}'
 
 
 class KodiLogHandler(logging.Handler):
-    """Logging handler that writes to the Kodi log with correct levels"""
+    """
+    Logging handler that writes to the Kodi log with correct levels
+
+    It also adds {addon_id} and {addon_version} variables available to log format.
+    """
     LEVEL_MAP = {
         logging.NOTSET: xbmc.LOGNONE,
         logging.DEBUG: xbmc.LOGDEBUG,
@@ -76,14 +80,14 @@ class GettextEmulator:
     class LocalizationError(Exception):  # pylint: disable=missing-docstring
         pass
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if cls._instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self):
-        self._en_gb_string_po_path = (ADDON_DIR / 'resources' / 'language'
-                                      / 'resource.language.en_gb' / 'strings.po')
+        self._en_gb_string_po_path = (ADDON_DIR / 'resources' / 'language' /
+                                      'resource.language.en_gb' / 'strings.po')
         if not self._en_gb_string_po_path.exists():
             raise self.LocalizationError(
                 'Missing resource.language.en_gb strings.po localization file')

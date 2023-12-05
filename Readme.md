@@ -13,8 +13,8 @@ Currently, Kodi supports 2 ways of accessing a common medialibrary with syncing 
 
 However, setting up a common MySQL/MariaDB database require some technical knowledge.
 Also all Kodi instances that access this database must be of the same major version.
-UPnP/DLNA access does not support full medialibrary information and introduces unnecessary overhead
-of streaming if files are located on network shares.
+On the other hand, UPnP/DLNA access does not support full medialibrary information
+and introduces unnecessary overhead of streaming if files are located on network shares.
 
 This plugin provides an alternative way of accessing a remote Kodi medialibrary and
 has the following advantages:

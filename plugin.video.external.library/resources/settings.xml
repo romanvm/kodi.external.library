@@ -110,7 +110,7 @@
         </setting>
         <setting id="watched_threshold_percent" type="integer" label="32012" help="32026">
           <level>0</level>
-          <default>97</default>
+          <default>95</default>
           <constraints>
             <minimum>90</minimum>
             <step>1</step>

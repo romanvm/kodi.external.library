@@ -28,7 +28,7 @@ with catch_exception(logger.error):
     logger.debug('Starting playback monitoring service...')
     kodi_monitor = xbmc.Monitor()
     play_monitor = PlayMonitor()
-    while not kodi_monitor.waitForAbort(0.5):
+    while not kodi_monitor.waitForAbort(1.0):
         if (play_monitor.isPlayingVideo()
                 and not xbmc.getCondVisibility('Player.Paused')
                 and play_monitor.is_monitoring):

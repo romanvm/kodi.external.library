@@ -1,2 +1,3 @@
 Kodistubs
 pylint
+kodi-addon-checker

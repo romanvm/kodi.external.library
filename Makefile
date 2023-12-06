@@ -6,3 +6,8 @@ lint:
 		plugin.video.external.library/service.py
 
 PHONY: lint
+
+check:
+	kodi-addon-checker --branch nexus plugin.video.external.library
+
+PHONY: check

@@ -55,7 +55,7 @@ class SimpleMediaPropertySetter:
         method(*args)
 
 
-class PlaycountSetter(SimpleMediaPropertySetter):
+class NotNoneValueSetter(SimpleMediaPropertySetter):
 
     def should_set(self) -> bool:
         return self._property_value is not None
@@ -178,7 +178,7 @@ MEDIA_PROPERTIES: List[Tuple[str, str, Type[SimpleMediaPropertySetter]]] = [
     ('tagline', 'setTagLine', SimpleMediaPropertySetter),
     ('plot', 'setPlot', SimpleMediaPropertySetter),
     ('plotoutline', 'setPlotOutline', SimpleMediaPropertySetter),
-    ('playcount', 'setPlaycount', PlaycountSetter),
+    ('playcount', 'setPlaycount', NotNoneValueSetter),
     ('writer', 'setWriters', SimpleMediaPropertySetter),
     ('studio', 'setStudios', SimpleMediaPropertySetter),
     ('mpaa', 'setMpaa', SimpleMediaPropertySetter),

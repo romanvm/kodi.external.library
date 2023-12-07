@@ -21,5 +21,6 @@
     </assets>
     <source>https://github.com/romanvm/kodi.external.library</source>
     <news>1.0.0: Initial public release.</news>
+    <reuselanguageinvoker>true</reuselanguageinvoker>
   </extension>
 </addon>

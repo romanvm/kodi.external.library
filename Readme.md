@@ -34,8 +34,11 @@ network shares as media sources.
   the colored one actually works. The other is no-op.
 - The plugin also appears in "Programs" section but just displays an information pop-up
   if launched from there.
+- Kodi built-in web-server is not very powerful and may have troubles streaming high-bitrate videofiles,
+  especially if the "source" Kodi is being used for something else at the same time.
+  It is recommended to store your files on network shares.
 
-Those are limitations of the Kodi addon API.
+Those are Kodi limitations.
 
 ## Installation
 

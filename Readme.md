@@ -39,7 +39,7 @@ Those are limitations of the Kodi addon API.
 
 ## Installation
 
-Currently, this plugin is being actively developed and no installation files are available.
+The plugin can be installed from the official Kodi addon repository -> **Video add-ons** section.
 
 ## Setup
 
@@ -54,6 +54,8 @@ as shown on the screenshot.
 
 In the first section ("**Access**") enter the host address of your remote Kodi instance.
 Also provide the port number, login and password configured on the previous step.
+
+![Access Settings](https://raw.githubusercontent.com/romanvm/kodi.external.library/master/screenshots/external-library-client-access.png)
 
 ## Credits
 

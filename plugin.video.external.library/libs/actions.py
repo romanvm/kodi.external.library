@@ -139,7 +139,7 @@ def show_media_items(content_type, tvshowid=None, season=None, parent_category=N
                 'playcount': media_info.get('playcount', 0),
             })
     xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))
-    MEM_STORAGE['__external_library_list__'] = mem_storage_items
+    MEM_STORAGE[f'__{ADDON_ID}_media_list__'] = mem_storage_items
     for sort_method in content_type_handler.get_sort_methods():
         xbmcplugin.addSortMethod(HANDLE, sort_method)
     logger.debug('Finished creating a list of %s items.', content_type)

@@ -21,7 +21,7 @@ from urllib.parse import quote
 import xbmc
 
 from libs import json_rpc_api
-from libs.kodi_service import ADDON
+from libs.kodi_service import ADDON, ADDON_ID
 from libs.mem_storage import MemStorage
 
 logger = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ class PlayMonitor(xbmc.Player):
                 self._total_time = -1
 
     def _get_item_info(self):
-        if listing := self._mem_storage.get('__external_library_list__'):
+        if listing := self._mem_storage.get(f'__{ADDON_ID}_media_list__'):
             files_on_shares = ADDON.getSettingBool('files_on_shares')
             for item in listing:
                 if files_on_shares and item['file'] == self._playing_file:

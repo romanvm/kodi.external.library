@@ -204,6 +204,11 @@ class RecentEpisodesHandler(EpisodesHandler):
     def get_sort_methods(self) -> List[int]:
         return []
 
+    def get_media_items(self) -> Iterable[Dict[str, Any]]:
+        for media_item in super().get_media_items():
+            media_item['title'] = f'{media_item["showtitle"]} - {media_item["label"]}'
+            yield media_item
+
 
 class MusicVideosHandler(PlayableContentMixin, BaseContentTypeHandler):
     mediatype = 'musicvideo'

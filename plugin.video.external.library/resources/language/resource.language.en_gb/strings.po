@@ -122,3 +122,7 @@ msgstr ""
 msgctxt "#32028"
 msgid "Recently added music videos"
 msgstr ""
+
+msgctxt "#32029"
+msgid "Use HTTPS"
+msgstr ""

@@ -38,7 +38,7 @@ class BaseJsonRpcApi:
             'method': self.method,
             'id': '1',
         }
-        params = self.get_params()
+        params = self.get_params()  # pylint: disable=assignment-from-none
         if params is not None:
             request['params'] = params
         logger.debug('JSON-RPC request: %s', pformat(request))

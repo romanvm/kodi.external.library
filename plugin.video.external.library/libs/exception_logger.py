@@ -155,7 +155,9 @@ def format_exception(exc_obj: Optional[Exception] = None) -> str:
 
 
 @contextmanager
-def catch_exception(logger_func: Callable[[str], None] = logger.error) -> Generator[None, None, None]:
+def catch_exception(
+        logger_func: Callable[[str], None] = logger.error
+) -> Generator[None, None, None]:
     """
     Diagnostic helper context manager
 
@@ -186,7 +188,7 @@ def catch_exception(logger_func: Callable[[str], None] = logger.error) -> Genera
     try:
         yield
     except Exception as exc:
-        message = format_exception(exc)
+        message = format_exception(exc)  # pylint: disable=logging-not-lazy
         # pylint: disable=line-too-long
         logger_func('\n*********************************** Unhandled exception detected ***********************************\n'
                     + message)

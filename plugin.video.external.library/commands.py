@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import logging
 import sys
 
 import xbmc
@@ -23,6 +23,7 @@ from libs.json_rpc_api import update_playcount
 from libs.kodi_service import GettextEmulator, initialize_logging
 
 initialize_logging()
+logger = logging.getLogger(__name__)
 _ = GettextEmulator.gettext
 
 

@@ -1,3 +1,4 @@
 Kodistubs
 pylint
 kodi-addon-checker
+git+https://github.com/romanvm/kodi.simple-requests.git

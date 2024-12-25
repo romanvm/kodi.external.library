@@ -59,13 +59,13 @@ class PlayMonitor(xbmc.Player):
 
     def onPlayBackStopped(self):
         self._send_played_file_state()
-        self._clear_state()
         logger.debug('Stopped monitoring %s. Playback stopped.', self._playing_file)
+        self._clear_state()
 
     def onPlayBackEnded(self):
         self._send_played_file_state()
-        self._clear_state()
         logger.debug('Stopped monitoring %s. Playback ended.', self._playing_file)
+        self._clear_state()
 
     def onPlayBackPaused(self):
         if self._should_send_resume():

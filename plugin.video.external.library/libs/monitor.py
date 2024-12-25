@@ -58,12 +58,12 @@ class PlayMonitor(xbmc.Player):
         logger.debug('Started monitoring %s', self._playing_file)
 
     def onPlayBackStopped(self):
-        self._send_played_file_state(should_refresh_list=True)
+        self._send_played_file_state(refresh_list=True)
         logger.debug('Stopped monitoring %s. Playback stopped.', self._playing_file)
         self._clear_state()
 
     def onPlayBackEnded(self):
-        self._send_played_file_state(should_refresh_list=True)
+        self._send_played_file_state(refresh_list=True)
         logger.debug('Stopped monitoring %s. Playback ended.', self._playing_file)
         self._clear_state()
 
@@ -115,10 +115,10 @@ class PlayMonitor(xbmc.Player):
         json_rpc_api.update_resume(item_id_param, self._item_info[item_id_param],
                                    self._current_time, self._total_time)
 
-    def _send_played_file_state(self, should_refresh_list=False):
+    def _send_played_file_state(self, refresh_list=False):
         if self._should_send_playcount():
             self._send_playcount()
         elif self._should_send_resume():
             self._send_resume()
-        if should_refresh_list:
+        if refresh_list:
             xbmc.executebuiltin('Container.Refresh')

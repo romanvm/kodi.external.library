@@ -13,7 +13,7 @@
   <extension point="xbmc.python.script" library="commands.py" />
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Kodi External Video Library</summary>
+    <summary lang="en_GB">Kodi external video library client</summary>
     <description lang="en_GB">A plugin that allows to browse and play items from a video library on an external Kodi instance.</description>
     <platform>all</platform>
     <license>GPL-3.0-only</license>

@@ -1,0 +1,64 @@
+name: Sync addon.xml Translations
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'plugin.video.external.library/addon.xml'
+      - 'plugin.video.external.library/resources/language/**/strings.po'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+
+jobs:
+  sync-to-po:
+    if: |
+      github.event_name == 'push' &&
+      !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Dump translations to .po files
+        run: python scripts/sync_addon_info_translations.py -d plugin.video.external.library
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync translations to .po files [skip ci]"
+          file_pattern: "plugin.video.external.library/resources/language/**/strings.po"
+
+  sync-to-xml:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.owner.login == 'weblate'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Load translations to addon.xml
+        run: python scripts/sync_addon_info_translations.py -l plugin.video.external.library
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync translations to addon.xml [skip ci]"
+          file_pattern: "plugin.video.external.library/addon.xml"

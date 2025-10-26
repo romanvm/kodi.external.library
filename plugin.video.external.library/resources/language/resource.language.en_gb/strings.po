@@ -134,3 +134,12 @@ msgstr ""
 msgctxt "#32031"
 msgid "Updating the remote videolibrary started."
 msgstr ""
+
+
+msgctxt "addon.xml:summary"
+msgid "Kodi External Video Library"
+msgstr ""
+
+msgctxt "addon.xml:description"
+msgid "A plugin that allows to browse and play items from a video library on an external Kodi instance."
+msgstr ""

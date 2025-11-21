@@ -1,0 +1,149 @@
+# Kodi Media Center Swedish language file - Kodi external library
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Daniel Nylander <github@danielnylander.se>\n"
+"Language-Team: sv\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+msgctxt "#32000"
+msgid "Access"
+msgstr "Åtkomst"
+
+msgctxt "#32001"
+msgid "Remote Kodi host"
+msgstr "Fjärrvärd för Kodi"
+
+msgctxt "#32002"
+msgid "Remote Kodi port"
+msgstr "Fjärrport för Kodi"
+
+msgctxt "#32003"
+msgid "Movies"
+msgstr "Filmer"
+
+msgctxt "#32004"
+msgid "Recently added movies"
+msgstr "Nyligen tillagda filmer"
+
+msgctxt "#32005"
+msgid "TV Shows"
+msgstr "TV-serier"
+
+msgctxt "#32006"
+msgid "Recently added episodes"
+msgstr "Nyligen tillagda avsnitt"
+
+msgctxt "#32007"
+msgid "Unable to connect to the remote Kodi host!"
+msgstr "Kunde inte ansluta till den fjärrvärden för Kodi!"
+
+msgctxt "#32008"
+msgid "Unable to retrieve data from the remote Kodi library!"
+msgstr "Kunde inte hämta data från Kodi-fjärrbiblioteket!"
+
+msgctxt "#32009"
+msgid "Flatten TV show seasons"
+msgstr "Platta ut tv-seriesäsonger"
+
+msgctxt "#32010"
+msgid "Mark as watched"
+msgstr "Markera som sedda"
+
+msgctxt "#32011"
+msgid "Mark as unwatched"
+msgstr "Markera som osedda"
+
+msgctxt "#32012"
+msgid "Watched status threshold"
+msgstr "Tröskelvärde för sedd-status"
+
+msgctxt "#32013"
+msgid "Kodi login"
+msgstr "Kodi-inloggning"
+
+msgctxt "#32014"
+msgid "Kodi password"
+msgstr "Kodi-lösenord"
+
+msgctxt "#32015"
+msgid "Kodi hostname or IP address (without protocol)"
+msgstr "Kodi-värdnamn eller IP-adress (utan protokoll)"
+
+msgctxt "#32016"
+msgid "Kodi Medialibrary on {kodi_host}"
+msgstr "Kodi-mediabibliotek på {kodi_host}"
+
+msgctxt "#32017"
+msgid "Kodi External Video Library Client"
+msgstr "Kodi-klient för externt videobibliotek"
+
+msgctxt "#32018"
+msgid "Please run this addon from \"Video addons\" section."
+msgstr "Kör detta tillägg från sektionen \"Videotillägg\"."
+
+msgctxt "#32019"
+msgid "Mediafiles on network shares"
+msgstr "Mediefiler på nätverksresurser"
+
+msgctxt "#32020"
+msgid "Enable if your mediafiles are stored on network shares accessible from this device."
+msgstr "Aktivera om dina mediefiler är lagrade på nätverksresurser som är tillgängliga från den här enheten."
+
+msgctxt "#32021"
+msgid "Videolibrary Sections"
+msgstr "Videobibliotekets sektioner"
+
+msgctxt "#32022"
+msgid "Playback"
+msgstr "Uppspelning"
+
+msgctxt "#32023"
+msgid "Seasons"
+msgstr "Säsonger"
+
+msgctxt "#32024"
+msgid "Playtime to start tracking progress (seconds)"
+msgstr "Speltid för att börja spåra framsteg (sekunder)"
+
+msgctxt "#32025"
+msgid "Playtime after which the plugin starts tracking playback progress."
+msgstr "Speltid efter vilken tillägget börjar spåra uppspelningsframsteg."
+
+msgctxt "#32026"
+msgid "Playback percentage after which the plugin marks a played video as watched."
+msgstr "Uppspelningsprocent efter vilken tillägget markerar en uppspelad video som sedd."
+
+msgctxt "#32027"
+msgid "Music videos"
+msgstr "Musikvideor"
+
+msgctxt "#32028"
+msgid "Recently added music videos"
+msgstr "Nyligen tillagda musikvideor"
+
+msgctxt "#32029"
+msgid "Use HTTPS"
+msgstr "Använd HTTPS"
+
+msgctxt "#32030"
+msgid "Update remote videolibrary"
+msgstr "Uppdatera fjärrvideobibliotek"
+
+msgctxt "#32031"
+msgid "Updating the remote videolibrary started."
+msgstr "Uppdatering av fjärrvideobiblioteket påbörjad."
+
+msgctxt "addon.xml:summary"
+msgid "Kodi external video library client"
+msgstr "Kodi-klient för externt videobibliotek"
+
+msgctxt "addon.xml:description"
+msgid "A plugin that allows to browse and play items from a video library on an external Kodi instance."
+msgstr "Ett tillägg som gör det möjligt att bläddra och spela upp objekt från ett videobibliotek på en extern Kodi-instans."
